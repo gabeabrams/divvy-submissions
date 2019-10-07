@@ -1,0 +1,37 @@
+{
+	"name": "divvy-submissions",
+	"version": "1.0.0",
+	"description": "A script that takes a list of graders and submissions, and divvies up the submissions among the graders while adhering to constraints.",
+	"main": "index.js",
+	"scripts": {
+		"test": "mocha --exit --recursive --reporter spec"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/gabeabrams/divvy-submissions.git"
+	},
+	"keywords": [
+		"Submission",
+		"Canvas",
+		"Grader",
+		"Divvy",
+		"Who",
+		"Grades",
+		"Whom",
+		"Grading"
+	],
+	"author": "",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/gabeabrams/divvy-submissions/issues"
+	},
+	"homepage": "https://github.com/gabeabrams/divvy-submissions#readme",
+	"devDependencies": {
+		"eslint": "^6.5.1",
+		"eslint-config-airbnb": "^18.0.1",
+		"eslint-plugin-import": "^2.18.2",
+		"eslint-plugin-jsx-a11y": "^6.2.3",
+		"eslint-plugin-react": "^7.16.0",
+		"mocha": "^6.2.1"
+	}
+}
