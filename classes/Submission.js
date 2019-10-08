@@ -16,8 +16,30 @@ class Submission {
     this.isSubmitted = false; // TODO: initialize this
   }
 
-  // TODO: add getters and setters for studentIds and isSubmitted
-  // TODO: add getter for id
+  // Getter for studentIds
+  getStudentIds() {
+    return this.studentIds;
+  }
+
+  // Getter for isSubmitted
+  getIsSubmitted() {
+    return this.isSubmitted;
+  }
+
+  // Setter for studentIds
+  setStudentIds(newStudentIds) {
+    this.studentIds = newStudentIds;
+  }
+
+  // Setter for isSubmitted
+  setIsSubmitted(newIsSubmitted) {
+    this.isSubmitted = newIsSubmitted;
+  }
+
+  // Getter for submissionId
+  getSubmissionId() {
+    return this.id;
+  }
 }
 
 module.exports = Submission;
