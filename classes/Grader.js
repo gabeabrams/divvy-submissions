@@ -12,8 +12,25 @@ class Grader {
     this.numToGrade = -1; // Initialize this later
   }
 
-  // TODO: add getters and setters for numToGrade
-  // TODO: add getter for allowedSubmissions and id
+  // Getter for numToGrade
+  get numToGrade() {
+    return this.numToGrade;
+  }
+
+  // Setter for numToGrade
+  set numToGrade(newNumToGrade) {
+    this.numToGrade = newNumToGrade;
+  }
+
+  // Getter for allowedSubmissions
+  get allowedSubmissions() {
+    return this.allowedSubmissions;
+  }
+
+  // Getter for grader id
+  get id() {
+    return this.id;
+  }
 }
 
 module.exports = Grader;
