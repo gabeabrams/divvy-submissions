@@ -28,5 +28,8 @@ describe('classes > Grader', function () {
       bob.getId() === fakeGraderId,
       'getter function for graderid did not return correct value'
     );
+    const newNumToGrade = 8;
+    bob.setNumToGrade(newNumToGrade);
+    assert(bob.getNumToGrade(), 'setter function did not function correctly');
   });
 });
