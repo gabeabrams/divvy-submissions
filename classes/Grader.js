@@ -13,22 +13,22 @@ class Grader {
   }
 
   // Getter for numToGrade
-  get numToGrade() {
+  getNumToGrade() {
     return this.numToGrade;
   }
 
   // Setter for numToGrade
-  set numToGrade(newNumToGrade) {
+  setNumToGrade(newNumToGrade) {
     this.numToGrade = newNumToGrade;
   }
 
   // Getter for allowedSubmissions
-  get allowedSubmissions() {
+  getAllowedSubmissions() {
     return this.allowedSubmissions;
   }
 
   // Getter for grader id
-  get id() {
+  getId() {
     return this.id;
   }
 }
