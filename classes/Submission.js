@@ -10,10 +10,11 @@ class Submission {
    * // TODO: write inputs here
    */
   constructor(opts) {
-    // TODO: initialize the sub props
+    const { studentIds, isSubmitted } = opts;
+
     this.id = getNextId();
-    this.studentIds = []; // TODO: initialize this
-    this.isSubmitted = false; // TODO: initialize this
+    this.studentIds = studentIds;
+    this.isSubmitted = isSubmitted;
   }
 
   // Getter for studentIds
