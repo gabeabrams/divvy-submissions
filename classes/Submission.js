@@ -1,18 +1,11 @@
-/**
- * // TODO: write JSDoc
- */
-const getNextId = () => {
-  // TODO: implement
-};
-
 class Submission {
   /**
-   * // TODO: write inputs here
+   * Create a new Submission instance
+   * @param {number[]} studentIds - the list of studentIds
+   * @param {boolean} isSubmitted - whether the student or group submitted
    */
-  constructor(opts) {
-    const { studentIds, isSubmitted } = opts;
-
-    this.id = getNextId();
+  constructor(studentIds, isSubmitted) {
+    this.id = Submission.getNextId();
     this.studentIds = studentIds;
     this.isSubmitted = isSubmitted;
   }
@@ -42,5 +35,17 @@ class Submission {
     return this.id;
   }
 }
+
+/**
+ * @return {number} the unique id for this submission,
+ *    generated in increasing order
+ */
+Submission.getNextId = () => {
+  // TODO: implement
+  Submission.instanceCount = (
+    Submission.instanceCount ? Submission.instanceCount + 1 : 1
+  );
+  return Submission.instanceCount;
+};
 
 module.exports = Submission;
