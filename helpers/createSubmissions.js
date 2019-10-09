@@ -10,5 +10,15 @@ const Submission = require('../classes/Submission');
  * @return {Submission[]} the submission objects
  */
 module.exports = (opts) => {
-  // TODO: implement
+  // Deconstruct opts
+  const { students, groups } = opts;
+
+  // If this is an individual assignment
+  if (!groups) {
+    return students.map((student) => {
+      return new Submission([student.id], student.isSubmitted);
+    });
+  }
+
+  // If this is a group assignment
 };
