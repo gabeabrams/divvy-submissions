@@ -41,7 +41,6 @@ class Submission {
  *    generated in increasing order
  */
 Submission.getNextId = () => {
-  // TODO: implement
   Submission.instanceCount = (
     Submission.instanceCount ? Submission.instanceCount + 1 : 1
   );
