@@ -21,4 +21,27 @@ module.exports = (opts) => {
   }
 
   // If this is a group assignment
+  const submissions = [];
+  // first process group submissions, remove group members from student array
+  groups.forEach((group) => {
+    let isSubmittedGroup = false;
+    group.forEach((student) => {
+      if (student.isSubmitted) {
+        isSubmittedGroup = true;
+      }
+      // remove this student from the students array
+      const index = students.indexOf(student);
+      if (index !== -1) {
+        students.splice(index, 1);
+      }
+    });
+    submissions.push(new Submission(group, isSubmittedGroup));
+  });
+
+  students.forEach((student) => {
+    const curSub = new Submission([student.id], student.isSubmitted);
+    submissions.push(curSub);
+  });
+
+  return submissions;
 };
