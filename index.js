@@ -3,7 +3,12 @@
  * @param {object[]} students - the full list of student entries in the form:
  *   { id, isSubmitted }
  * @param {object[]} graders - the full list of grader entries in the form:
- *   { id, proportionalWorkload }
+ *   { id, proportionalWorkload } where proportionalWorkload is a number
+ *   representing how many submissions this grader will grade compared with
+ *   other graders. For example, with a proportionalWorkload of 1, they grade
+ *   a normal amount. With a proportionalWorkload of 2, they grade double as
+ *   much as others. With a proportionalWorkload of 0.7, they grade 70% as much
+ *   as other graders.
  * @param {object[]} [bannedPairs] - a list of pairs in the form
  *   { grader: <grader id>, student: <student id> } where in each pair, the
  *   specified grader is not allowed to grade the specified student

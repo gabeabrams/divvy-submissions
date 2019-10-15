@@ -10,33 +10,49 @@ class Submission {
     this.isSubmitted = isSubmitted;
   }
 
-  // Getter for studentIds
+  /**
+   * Getter for studentIds
+   * @return {number[]} studentIds - the list of studentIds
+   */
   getStudentIds() {
     return this.studentIds;
   }
 
-  // Getter for isSubmitted
+  /**
+   * Getter for isSubmitted
+   * @return {boolean} - whether the student or group submitted
+   */
   getIsSubmitted() {
     return this.isSubmitted;
   }
 
-  // Setter for studentIds
+  /**
+   * Set studentIds
+   * @param {number[]} studentIds - the new list of studentIds
+   */
   setStudentIds(newStudentIds) {
     this.studentIds = newStudentIds;
   }
 
-  // Setter for isSubmitted
+  /**
+   * Set isSubmitted
+   * @param {boolean} newIsSubmitted - if true, this has been submitted
+   */
   setIsSubmitted(newIsSubmitted) {
     this.isSubmitted = newIsSubmitted;
   }
 
-  // Getter for submissionId
+  /**
+   * Get submissionId
+   * @return {number} the submission id
+   */
   getSubmissionId() {
     return this.id;
   }
 }
 
 /**
+ * Generate a new unique submission id
  * @return {number} the unique id for this submission,
  *    generated in increasing order
  */

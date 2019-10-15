@@ -14,34 +14,26 @@ module.exports = (opts) => {
   const { students, groups } = opts;
 
   // If this is an individual assignment
-  if (!groups) {
+  if (!groups || groups.length === 0) {
     return students.map((student) => {
       return new Submission([student.id], student.isSubmitted);
     });
   }
 
-  // If this is a group assignment
-  const submissions = [];
-  // first process group submissions, remove group members from student array
-  groups.forEach((group) => {
-    let isSubmittedGroup = false;
-    group.forEach((student) => {
-      if (student.isSubmitted) {
-        isSubmittedGroup = true;
-      }
-      // remove this student from the students array
-      const index = students.indexOf(student);
-      if (index !== -1) {
-        students.splice(index, 1);
-      }
-    });
-    submissions.push(new Submission(group, isSubmittedGroup));
-  });
-
+  // Pre-process students for quick lookup
+  const studentIsSubmitted = {}; // studentId => isSubmitted
   students.forEach((student) => {
-    const curSub = new Submission([student.id], student.isSubmitted);
-    submissions.push(curSub);
+    studentIsSubmitted[student.id] = student.isSubmitted;
   });
 
-  return submissions;
+  // If this is a group assignment
+  return groups.map((group) => {
+    // Check if anyone in the group has submitted
+    const isSubmittedGroup = group.some((studentId) => {
+      return studentIsSubmitted[studentId];
+    });
+
+    // Create a new submission instance
+    return new Submission(group, isSubmittedGroup);
+  });
 };

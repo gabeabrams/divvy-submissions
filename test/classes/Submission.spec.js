@@ -3,6 +3,7 @@ const Submission = require('../../classes/Submission');
 
 describe('classes > Submission', function () {
   it('returns correct values for getter, setter function', async function () {
+    // Create fake data
     const fakeStudentIds = [1, 3, 4];
     const fakeIsSubmitted = true;
 
