@@ -21,8 +21,9 @@ module.exports = (opts) => {
     submissions,
     graders,
     bannedPairs,
-    requiredPairs,
   } = opts;
+
+  let { requiredPairs } = opts;
 
   // pre processing constraints
   const studentToRequiredGraderMapping = {};
@@ -35,42 +36,40 @@ module.exports = (opts) => {
       studentToRequiredGraderMapping[student] = [grader];
     }
   });
-  console.log('required pairs is ', requiredPairs);
-  console.log('studentToRequiredGraderMapping is ', studentToRequiredGraderMapping);
 
-  Object.keys(studentToRequiredGraderMapping).forEach((studentId) => {
+  Object.keys(studentToRequiredGraderMapping).forEach((student) => {
+    // Object.keys return string, convert to number
+    const studentId = parseInt(student, 10);
+
     const requiredGradersIds = studentToRequiredGraderMapping[studentId];
     if (requiredGradersIds.length > 1) {
-      requiredPairs.filter((pair) => {
-        return (pair.student !== studentId);
+      requiredPairs = requiredPairs.filter((pair) => {
+        return pair.student !== studentId;
       });
     }
   });
-  console.log('required pair is ', requiredPairs);
 
-  // const graderIdToGraderMapping = {};
-  // graders.forEach((grader) => {
-  //   graderIdToGraderMapping[grader.id] = new Grader(
-  //     grader.id,
-  //     submissions,
-  //     grader.proportionalWorkload
-  //   );
-  // });
-  // console.log('graderIdToGraderMapping is ', JSON.stringify(graderIdToGraderMapping));
+  const graderIdToGraderMapping = {};
+  graders.forEach((grader) => {
+    graderIdToGraderMapping[grader.id] = new Grader(
+      grader.id,
+      submissions,
+      grader.proportionalWorkload
+    );
+  });
 
-  // // process banned pairs, remove the submission that contains the student
-  // // from the graders allowed grading list
-  // bannedPairs.forEach((bannedPair) => {
-  //   const { grader, student } = bannedPair;
+  // process banned pairs, remove the submission that contains the student
+  // from the graders allowed grading list
+  bannedPairs.forEach((bannedPair) => {
+    const { grader, student } = bannedPair;
 
-  //   const newAllowedSubmissions = (
-  //     graderIdToGraderMapping[grader].getAllowedSubmissions().filter((sub) => {
-  //       return !(sub.getStudentIds()).includes(student);
-  //     }));
+    const newAllowedSubmissions = (
+      graderIdToGraderMapping[grader].getAllowedSubmissions().filter((sub) => {
+        return !(sub.getStudentIds()).includes(student);
+      }));
 
-  //   graderIdToGraderMapping[grader].setAllowedSubmissions(
-  //     newAllowedSubmissions
-  //   );
-  // });
-  // console.log('graderIdToGraderMapping is ', JSON.stringify(graderIdToGraderMapping));
+    graderIdToGraderMapping[grader].setAllowedSubmissions(
+      newAllowedSubmissions
+    );
+  });
 };
