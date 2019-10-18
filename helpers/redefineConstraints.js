@@ -26,6 +26,7 @@ module.exports = (opts) => {
   let { requiredPairs } = opts;
 
   // pre processing constraints
+  // check if there exist impossible required grader constraints
   const studentToRequiredGraderMapping = {};
   requiredPairs.forEach((requiredPair) => {
     const { grader, student } = requiredPair;
@@ -37,6 +38,8 @@ module.exports = (opts) => {
     }
   });
 
+  // if student is required to be graded by multiple grader, remove that student
+  // from all graders' allowed submissions
   Object.keys(studentToRequiredGraderMapping).forEach((student) => {
     // Object.keys return string, convert to number
     const studentId = parseInt(student, 10);
@@ -49,6 +52,7 @@ module.exports = (opts) => {
     }
   });
 
+  // create map to easily access grader object through their id
   const graderIdToGraderMapping = {};
   graders.forEach((grader) => {
     graderIdToGraderMapping[grader.id] = new Grader(
@@ -72,4 +76,29 @@ module.exports = (opts) => {
       newAllowedSubmissions
     );
   });
+
+  // process required pairs, if a grader is required to grade a student, remove
+  // submissions that contains that student from all other graders
+  requiredPairs.forEach((requiredPair) => {
+    const graderId = requiredPair.grader;
+    const studentId = requiredPair.student;
+    // go through graderIdToGraderMapping, if it's not the current grader
+    // remove the submission containing the student
+    Object.keys(graderIdToGraderMapping).forEach((grader) => {
+      // Object.keys return string, convert to number
+      const id = parseInt(grader, 10);
+      if (id !== graderId) {
+        const allowedSubmissions = (
+          graderIdToGraderMapping[id].getAllowedSubmissions()
+        );
+        const newAllowedSubs = allowedSubmissions.filter((sub) => {
+          return !sub.getStudentIds().includes(studentId);
+        });
+        // set new allowed submissions
+        graderIdToGraderMapping[id].setAllowedSubmissions(newAllowedSubs);
+      }
+    });
+  });
+
+  return Object.values(graderIdToGraderMapping);
 };
