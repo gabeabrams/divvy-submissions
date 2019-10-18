@@ -3,7 +3,8 @@ const Submission = require('../../classes/Submission');
 const redifineConstraints = require('../../helpers/redefineConstraints');
 
 describe('helpers > redifineConstraints', function () {
-  it('returns correct submissions for individual homeworks', async function () {
+  it('returns correct graders w/ impossible required pair', async function () {
+    // create fake data
     const fakeSubmissions = [
       new Submission([1, 2], true),
       new Submission([3], true),
@@ -24,7 +25,6 @@ describe('helpers > redifineConstraints', function () {
       },
     ];
 
-    // { grader: <grader id>, student: <student id> }
     const fakeBannedPairs = [
       {
         grader: 1,
@@ -54,6 +54,48 @@ describe('helpers > redifineConstraints', function () {
       requiredPairs: fakeRequiredPairs,
     };
 
-    redifineConstraints(opts);
+    const graders = redifineConstraints(opts);
+
+    // based on our fake data, the expected output is listed below
+    const expectedGraders = [
+      {
+        id: 1,
+        allowedSubmissions: [
+          {
+            id: 2,
+            studentIds: [3],
+            isSubmitted: true,
+          },
+        ],
+        proportionalWorkload: 1,
+        numToGrade: -1,
+      },
+      {
+        id: 2,
+        allowedSubmissions: [
+          {
+            id: 1,
+            studentIds: [1, 2],
+            isSubmitted: true,
+          },
+        ],
+        proportionalWorkload: 1,
+        numToGrade: -1,
+      },
+      {
+        id: 3,
+        allowedSubmissions: [
+          {
+            id: 1,
+            studentIds: [1, 2],
+            isSubmitted: true,
+          },
+        ],
+        proportionalWorkload: 1,
+        numToGrade: -1,
+      },
+    ];
+
+    assert.equal(JSON.stringify(graders), JSON.stringify(expectedGraders), 'not equal');
   });
 });
