@@ -39,29 +39,39 @@ module.exports = (graders, numSubmissions) => {
     totalWorkload += grader.getProportionalWorkload();
   });
 
+  console.log('total wordload is ', totalWorkload);
+
   // number of submissions left to assign after initial distribution
   let numSubsLeft = numSubmissions;
+
+  let firstDistributedSubs = Math.floor(numSubmissions / totalWorkload);
 
   // distribute number of submissions each grader will grade for sure
   graders.forEach((grader) => {
     // the number of submissions this grader grades
     const numToGrade = (
-      Math.floor(
-        (grader.getProportionalWorkload() * numSubmissions) / totalWorkload
-      )
+      // Math.floor(
+      //   (grader.getProportionalWorkload() * numSubmissions) / totalWorkload
+      // )
+      firstDistributedSubs * grader.getProportionalWorkload()
     );
 
     grader.setNumToGrade(numToGrade);
     numSubsLeft -= numToGrade;
   });
 
+  console.log('after first distribution the graders is ', graders);
+
   // If we have assigned every submission in first try, return
   if (numSubsLeft === 0) {
     return graders;
   }
+  console.log('num subs left is ', numSubsLeft);
 
   // shuffle the list of graders using fisher-yates algorithm
   const randomGraders = shuffle(graders);
+
+  console.log('random graders is ', randomGraders);
 
   // an array of values signifying the beginning and end of an interval, which
   // serves as visual representation of proportional workload. If a submission
@@ -74,16 +84,21 @@ module.exports = (graders, numSubmissions) => {
   const indexToGraderMapping = {};
 
   let intervalSum = 0;
+  intervals.push(intervalSum);
+
   randomGraders.forEach((grader) => {
-    intervals.push(intervalSum);
     indexToGraderMapping[intervalSum] = grader;
     intervalSum += grader.getProportionalWorkload();
+    intervals.push(intervalSum);
   });
 
+  console.log('intervals is ', intervals);
+  console.log('interval sum is ', intervalSum);
   // use this to create a representation of submissions left
   const proportion = intervalSum / (numSubsLeft + 1);
   let submissionNumber = proportion;
 
+  console.log('proportion is ', proportion);
   // assign submissions left to graders until they have been all assigned
   while (numSubsLeft > 0) {
     let index;
@@ -95,8 +110,9 @@ module.exports = (graders, numSubmissions) => {
         break;
       }
     }
+    console.log('index found is ', index);
     // find the corresponding grader
-    const graderToAssign = indexToGraderMapping[index];
+    const graderToAssign = indexToGraderMapping[intervals[index]];
     // increase by 1
     graderToAssign.setNumToGrade(graderToAssign.getNumToGrade() + 1);
     // decrease numSubsLeft by 1
@@ -104,6 +120,6 @@ module.exports = (graders, numSubmissions) => {
     // increase submissionNumber by proportion
     submissionNumber += proportion;
   }
-
+  console.log('random graders returned is ', randomGraders);
   return randomGraders;
 };
