@@ -6,9 +6,9 @@ describe('helpers > calculateWorkloads', function () {
   it('returns correct workloads when divides evenly', async function () {
     // create fake data
     const fakeGraders = [
-      new Grader(1, [], 1),
-      new Grader(2, [], 1),
-      new Grader(3, [], 1),
+      new Grader(100, [], 1),
+      new Grader(200, [], 1),
+      new Grader(300, [], 1),
     ];
 
     const fakeNumSubmissions = 6;
@@ -29,9 +29,9 @@ describe('helpers > calculateWorkloads', function () {
   it('returns correct workloads when divides evenly 2', async function () {
     // create fake data
     const fakeGraders = [
-      new Grader(1, [], 1),
-      new Grader(2, [], 2),
-      new Grader(3, [], 3),
+      new Grader(100, [], 1),
+      new Grader(200, [], 2),
+      new Grader(300, [], 3),
     ];
 
     const fakeNumSubmissions = 6;
@@ -52,9 +52,9 @@ describe('helpers > calculateWorkloads', function () {
   it('returns correct workloads if does not divide evenly', async function () {
     // create fake data
     const fakeGraders = [
-      new Grader(1, [], 1),
-      new Grader(2, [], 2),
-      new Grader(3, [], 2),
+      new Grader(100, [], 1),
+      new Grader(200, [], 2),
+      new Grader(300, [], 2),
     ];
 
     const fakeNumSubmissions = 6;
@@ -75,12 +75,12 @@ describe('helpers > calculateWorkloads', function () {
     );
   });
 
-  it.only('returns correct workload if does not divide evenly 2', async function () {
+  it('returns correct workload if does not divide evenly 2', async function () {
     // create fake data
     const fakeGraders = [
-      new Grader(1, [], 1),
-      new Grader(2, [], 2),
-      new Grader(3, [], 2),
+      new Grader(100, [], 1),
+      new Grader(200, [], 2),
+      new Grader(300, [], 2),
     ];
 
     const fakeNumSubmissions = 9;
@@ -101,12 +101,12 @@ describe('helpers > calculateWorkloads', function () {
     );
   });
 
-  it('returns correct workload if does not divide evenly 3', async function () {
+  it.only('returns correct workload if does not divide evenly 3', async function () {
     // create fake data
     const fakeGraders = [
-      new Grader(1, [], 3),
-      new Grader(2, [], 3),
-      new Grader(3, [], 3),
+      new Grader(100, [], 3),
+      new Grader(200, [], 3),
+      new Grader(300, [], 3),
     ];
 
     const fakeNumSubmissions = 2;
@@ -130,9 +130,9 @@ describe('helpers > calculateWorkloads', function () {
   it('returns correct workload if does not divide evenly 3', async function () {
     // create fake data
     const fakeGraders = [
-      new Grader(1, [], 3),
-      new Grader(2, [], 3),
-      new Grader(3, [], 4),
+      new Grader(100, [], 3),
+      new Grader(200, [], 3),
+      new Grader(300, [], 4),
     ];
 
     const fakeNumSubmissions = 2;

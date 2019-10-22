@@ -4,7 +4,11 @@
  * @return {Graders[]} - the list of graders after being randomly shuffled
  */
 const shuffle = (array) => {
+  // Perform a shallow clone
   const arr = array.slice(0);
+
+  // Run standard algorithm (Fisher–Yates shuffle)
+  // Adapted from: https://bost.ocks.org/mike/shuffle/
   let currentIndex = arr.length;
   let temp;
   let randomIndex;
@@ -28,36 +32,57 @@ const shuffle = (array) => {
  * Based on each grader's proportionalWorkload, determines each grader's number
  *   of submissions they have to grade and adds that number to the grader
  *   instances
- * @param {Grader[]} graders - the list of graders who are grading
+ * @param {Grader[]} originalGraders - the list of graders who are grading
  * @param {number} numSubmissions - the total number of submissions to grade
+ * @return {Grader[]} graders updated with their workloads (num grading)
  */
-module.exports = (graders, numSubmissions) => {
-  // first under distribute all the submissions
-  let totalWorkload = 0;
-  // calculate total workload
-  graders.forEach((grader) => {
-    totalWorkload += grader.getProportionalWorkload();
-  });
+module.exports = (originalGraders, numSubmissions) => {
+  // Clone the list of graders
+  let graders = originalGraders.slice(0);
 
-  console.log('total wordload is ', totalWorkload);
+  // Calculate students per proportional workload unit
+  let studentsPerPropWorkloadUnit = (
+    numSubmissions / totalProportionalWorkload
+  );
 
-  // number of submissions left to assign after initial distribution
+  // Rescale proportional workloads if there is more workload than subs
+  if (studentsPerPropWorkloadUnit < 1) {
+    graders = graders.map((grader) => {
+      // TODO: rescale the prop workloads so that studentsPerPropWorkloadUnit is greater than 1
+      // (multiply them all by some large enough number -- numSubmissions?)
+    });
+  }
+
+  /* --------- Step 1: Distribute Rounded Down Num of Subs -------- */
+
+  // Number of submissions left to assign after initial distribution
   let numSubsLeft = numSubmissions;
 
-  const firstDistributedSubs = Math.floor(numSubmissions / totalWorkload);
+  // calculate total workload
+  let totalProportionalWorkload = 0;
+  graders.forEach((grader) => {
+    totalProportionalWorkload += grader.getProportionalWorkload();
+  });
+  console.log('total workload is ', totalProportionalWorkload);
+
+
 
   // distribute number of submissions each grader will grade for sure
-  graders.forEach((grader) => {
-    // the number of submissions this grader grades
-    const numToGrade = (
-      // Math.floor(
-      //   (grader.getProportionalWorkload() * numSubmissions) / totalWorkload
-      // )
-      firstDistributedSubs * grader.getProportionalWorkload()
-    );
+  graders = graders.map((grader) => {
+    // Get grader info
+    const proportionalWorkload = grader.getProportionalWorkload();
 
+    // Assign students to this grader
+    const numToGrade = Math.floor(
+      studentsPerPropWorkloadUnit * proportionalWorkload
+    );
     grader.setNumToGrade(numToGrade);
+
+    // Keep track of number of subs left
     numSubsLeft -= numToGrade;
+
+    // Return the updated grader
+    return grader;
   });
 
   console.log('after first distribution the graders is ', graders);
@@ -68,6 +93,8 @@ module.exports = (graders, numSubmissions) => {
   }
   console.log('num subs left is ', numSubsLeft);
 
+  /* ---------------- Step 2: Assign Leftover Subs ---------------- */
+
   // shuffle the list of graders using fisher-yates algorithm
   const randomGraders = shuffle(graders);
 
@@ -77,49 +104,63 @@ module.exports = (graders, numSubmissions) => {
   // serves as visual representation of proportional workload. If a submission
   // lies in the interval [start, end), then we assign this submission to the
   // grader corresponding to this interval
-  const intervals = [];
 
-  // mapping between index, the start of each interval, and the grader
-  // corresponding to that interval
-  const indexToGraderMapping = {};
-
+  // Array of breakpoints in form { end, grader }
+  // Where end is the proportional workload marker where the interval ends
+  // and grader is the grader corresponding to the interval
   let intervalSum = 0;
-  intervals.push(intervalSum);
-
-  randomGraders.forEach((grader) => {
-    indexToGraderMapping[intervalSum] = grader;
+  const breakpoints = randomGraders.map((grader) => {
+    // Increment the running sum
     intervalSum += grader.getProportionalWorkload();
-    intervals.push(intervalSum);
+
+    // Create a breakpoint object
+    return {
+      grader,
+      end: intervalSum,
+    };
   });
 
-  console.log('intervals is ', intervals);
-  console.log('interval sum is ', intervalSum);
-  // use this to create a representation of submissions left
-  const proportion = intervalSum / (numSubsLeft + 1);
-  let submissionNumber = proportion;
+  /**
+   * Look up grader corresponding to a number within interval
+   * @param {number} submissionNumber - the number of the submission on the
+   *   interval line
+   * @return {Grader} the grader who is grading this submission
+   */
+  const calculateGrader = (submissionNumber) => {
+    for (let i = 0; i < breakpoints.length - 1; i++) {
+      // Get info on current breakpoint
+      const {
+        grader,
+        end,
+      } = breakpoints[i];
 
-  console.log('proportion is ', proportion);
-  // assign submissions left to graders until they have been all assigned
-  while (numSubsLeft > 0) {
-    let index;
-    for (let i = 0; i < intervals.length - 1; i++) {
-      if (
-        intervals[i] <= submissionNumber && intervals[i + 1] > submissionNumber
-      ) {
-        index = i;
-        break;
+      // Check if this breakpoint corresponds to the number given
+      if (submissionNumber < end) {
+        return grader;
       }
     }
-    console.log('index found is ', index);
+
+    // An error occurred! We shouldn't have made it out of the loop
+    throw new Error('Could not find the grader based on a submissionNumber');
+  };
+
+  // Divide the remaining submissions across the breakpoints:
+  const subIntervalWidth = (intervalSum / (numSubsLeft + 1));
+
+  // assign submissions left to graders until they have been all assigned
+  let submissionNumber = subIntervalWidth;
+  while (numSubsLeft > 0) {
     // find the corresponding grader
-    const graderToAssign = indexToGraderMapping[intervals[index]];
+    const graderToAssign = calculateGrader(submissionNumber);
+
     // increase by 1
     graderToAssign.setNumToGrade(graderToAssign.getNumToGrade() + 1);
     // decrease numSubsLeft by 1
     numSubsLeft -= 1;
-    // increase submissionNumber by proportion
-    submissionNumber += proportion;
+    // increase submissionNumber by subIntervalWidth
+    submissionNumber += subIntervalWidth;
   }
+
   console.log('random graders returned is ', randomGraders);
   return randomGraders;
 };
