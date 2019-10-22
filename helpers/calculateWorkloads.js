@@ -44,7 +44,7 @@ module.exports = (graders, numSubmissions) => {
   // number of submissions left to assign after initial distribution
   let numSubsLeft = numSubmissions;
 
-  let firstDistributedSubs = Math.floor(numSubmissions / totalWorkload);
+  const firstDistributedSubs = Math.floor(numSubmissions / totalWorkload);
 
   // distribute number of submissions each grader will grade for sure
   graders.forEach((grader) => {
