@@ -74,4 +74,82 @@ describe('helpers > calculateWorkloads', function () {
       'did not assign every submission to grader'
     );
   });
+
+  it.only('returns correct workload if does not divide evenly 2', async function () {
+    // create fake data
+    const fakeGraders = [
+      new Grader(1, [], 1),
+      new Grader(2, [], 2),
+      new Grader(3, [], 2),
+    ];
+
+    const fakeNumSubmissions = 9;
+
+    // call function
+    const res = calculateWorkloads(fakeGraders, fakeNumSubmissions);
+
+    let subAssigned = 0;
+    res.forEach((grader) => {
+      subAssigned += grader.getNumToGrade();
+    });
+
+    // check if all submissions have been assigned
+    assert.equal(
+      subAssigned,
+      fakeNumSubmissions,
+      'did not assign every submission to grader'
+    );
+  });
+
+  it('returns correct workload if does not divide evenly 3', async function () {
+    // create fake data
+    const fakeGraders = [
+      new Grader(1, [], 3),
+      new Grader(2, [], 3),
+      new Grader(3, [], 3),
+    ];
+
+    const fakeNumSubmissions = 2;
+
+    // call function
+    const res = calculateWorkloads(fakeGraders, fakeNumSubmissions);
+
+    let subAssigned = 0;
+    res.forEach((grader) => {
+      subAssigned += grader.getNumToGrade();
+    });
+
+    // check if all submissions have been assigned
+    assert.equal(
+      subAssigned,
+      fakeNumSubmissions,
+      'did not assign every submission to grader'
+    );
+  });
+
+  it('returns correct workload if does not divide evenly 3', async function () {
+    // create fake data
+    const fakeGraders = [
+      new Grader(1, [], 3),
+      new Grader(2, [], 3),
+      new Grader(3, [], 4),
+    ];
+
+    const fakeNumSubmissions = 2;
+
+    // call function
+    const res = calculateWorkloads(fakeGraders, fakeNumSubmissions);
+
+    let subAssigned = 0;
+    res.forEach((grader) => {
+      subAssigned += grader.getNumToGrade();
+    });
+
+    // check if all submissions have been assigned
+    assert.equal(
+      subAssigned,
+      fakeNumSubmissions,
+      'did not assign every submission to grader'
+    );
+  });
 });
