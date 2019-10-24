@@ -50,20 +50,11 @@ module.exports = (originalGraders, numSubmissions) => {
   graders.forEach((grader) => {
     totalProportionalWorkload += grader.getProportionalWorkload();
   });
-  console.log('total workload is ', totalProportionalWorkload);
 
   // Calculate students per proportional workload unit
-  let studentsPerPropWorkloadUnit = (
+  const studentsPerPropWorkloadUnit = (
     numSubmissions / totalProportionalWorkload
   );
-
-  // // Rescale proportional workloads if there is more workload than subs
-  // if (studentsPerPropWorkloadUnit < 1) {
-  //   graders = graders.map((grader) => {
-  //     // TODO: rescale the prop workloads so that studentsPerPropWorkloadUnit is greater than 1
-  //     // (multiply them all by some large enough number -- numSubmissions?)
-  //   });
-  // }
 
   // distribute number of submissions each grader will grade for sure
   graders = graders.map((grader) => {
@@ -83,20 +74,15 @@ module.exports = (originalGraders, numSubmissions) => {
     return grader;
   });
 
-  console.log('after first distribution the graders is ', graders);
-
   // If we have assigned every submission in first try, return
   if (numSubsLeft === 0) {
     return graders;
   }
-  console.log('num subs left is ', numSubsLeft);
 
   /* ---------------- Step 2: Assign Leftover Subs ---------------- */
 
   // shuffle the list of graders using fisher-yates algorithm
   const randomGraders = shuffle(graders);
-
-  console.log('random graders is ', randomGraders);
 
   // Array of breakpoints in form { end, grader }
   // Where end is the proportional workload marker where the interval ends
@@ -113,8 +99,6 @@ module.exports = (originalGraders, numSubmissions) => {
     };
   });
 
-  console.log('break point is ', breakpoints);
-
   /**
    * Look up grader corresponding to a number within interval
    * @param {number} submissionNumber - the number of the submission on the
@@ -129,8 +113,6 @@ module.exports = (originalGraders, numSubmissions) => {
         end,
       } = breakpoints[i];
 
-      console.log('grader, end is ', grader, end);
-
       // Check if this breakpoint corresponds to the number given
       if (submissionNumber < end) {
         return grader;
@@ -144,25 +126,18 @@ module.exports = (originalGraders, numSubmissions) => {
   // Divide the remaining submissions across the breakpoints:
   const subIntervalWidth = (intervalSum / (numSubsLeft + 1));
 
-  console.log('subIntervalWidth is ', subIntervalWidth);
-
   // assign submissions left to graders until they have been all assigned
   let submissionNumber = subIntervalWidth;
   while (numSubsLeft > 0) {
     // find the corresponding grader
     const graderToAssign = calculateGrader(submissionNumber);
-
-    console.log('graderToAssign is ', graderToAssign);
-
     // increase by 1
     graderToAssign.setNumToGrade(graderToAssign.getNumToGrade() + 1);
     // decrease numSubsLeft by 1
     numSubsLeft -= 1;
     // increase submissionNumber by subIntervalWidth
     submissionNumber += subIntervalWidth;
-    console.log('submissio nnumber is ', submissionNumber);
   }
 
-  console.log('random graders returned is ', randomGraders);
   return randomGraders;
 };
