@@ -70,6 +70,14 @@ class Edge {
   getFlow() {
     return this.flow;
   }
+
+  /**
+   * Set flow
+   * @param {number} - the new flow of this edge
+   */
+  setFlow(newFlow) {
+    this.flow = newFlow;
+  }
 }
 
 module.exports = Edge;
