@@ -65,8 +65,6 @@ module.exports = (originalGraders, numSubmissions) => {
   });
   console.log('total workload is ', totalProportionalWorkload);
 
-
-
   // distribute number of submissions each grader will grade for sure
   graders = graders.map((grader) => {
     // Get grader info
