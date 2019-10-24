@@ -2,7 +2,7 @@ const assert = require('assert');
 const Edge = require('../../../ford/classes/Edge');
 
 describe('ford > classes > Edge', function () {
-  it.only('returns correct values for getter, setter function', async function () {
+  it('returns correct values for getter, setter function', async function () {
     // Create dummy info
     const startNode = {
       field: 'info',
