@@ -40,19 +40,6 @@ module.exports = (originalGraders, numSubmissions) => {
   // Clone the list of graders
   let graders = originalGraders.slice(0);
 
-  // Calculate students per proportional workload unit
-  let studentsPerPropWorkloadUnit = (
-    numSubmissions / totalProportionalWorkload
-  );
-
-  // Rescale proportional workloads if there is more workload than subs
-  if (studentsPerPropWorkloadUnit < 1) {
-    graders = graders.map((grader) => {
-      // TODO: rescale the prop workloads so that studentsPerPropWorkloadUnit is greater than 1
-      // (multiply them all by some large enough number -- numSubmissions?)
-    });
-  }
-
   /* --------- Step 1: Distribute Rounded Down Num of Subs -------- */
 
   // Number of submissions left to assign after initial distribution
@@ -64,6 +51,19 @@ module.exports = (originalGraders, numSubmissions) => {
     totalProportionalWorkload += grader.getProportionalWorkload();
   });
   console.log('total workload is ', totalProportionalWorkload);
+
+  // Calculate students per proportional workload unit
+  let studentsPerPropWorkloadUnit = (
+    numSubmissions / totalProportionalWorkload
+  );
+
+  // // Rescale proportional workloads if there is more workload than subs
+  // if (studentsPerPropWorkloadUnit < 1) {
+  //   graders = graders.map((grader) => {
+  //     // TODO: rescale the prop workloads so that studentsPerPropWorkloadUnit is greater than 1
+  //     // (multiply them all by some large enough number -- numSubmissions?)
+  //   });
+  // }
 
   // distribute number of submissions each grader will grade for sure
   graders = graders.map((grader) => {
@@ -98,11 +98,6 @@ module.exports = (originalGraders, numSubmissions) => {
 
   console.log('random graders is ', randomGraders);
 
-  // an array of values signifying the beginning and end of an interval, which
-  // serves as visual representation of proportional workload. If a submission
-  // lies in the interval [start, end), then we assign this submission to the
-  // grader corresponding to this interval
-
   // Array of breakpoints in form { end, grader }
   // Where end is the proportional workload marker where the interval ends
   // and grader is the grader corresponding to the interval
@@ -118,6 +113,8 @@ module.exports = (originalGraders, numSubmissions) => {
     };
   });
 
+  console.log('break point is ', breakpoints);
+
   /**
    * Look up grader corresponding to a number within interval
    * @param {number} submissionNumber - the number of the submission on the
@@ -125,12 +122,14 @@ module.exports = (originalGraders, numSubmissions) => {
    * @return {Grader} the grader who is grading this submission
    */
   const calculateGrader = (submissionNumber) => {
-    for (let i = 0; i < breakpoints.length - 1; i++) {
+    for (let i = 0; i < breakpoints.length; i++) {
       // Get info on current breakpoint
       const {
         grader,
         end,
       } = breakpoints[i];
+
+      console.log('grader, end is ', grader, end);
 
       // Check if this breakpoint corresponds to the number given
       if (submissionNumber < end) {
@@ -145,11 +144,15 @@ module.exports = (originalGraders, numSubmissions) => {
   // Divide the remaining submissions across the breakpoints:
   const subIntervalWidth = (intervalSum / (numSubsLeft + 1));
 
+  console.log('subIntervalWidth is ', subIntervalWidth);
+
   // assign submissions left to graders until they have been all assigned
   let submissionNumber = subIntervalWidth;
   while (numSubsLeft > 0) {
     // find the corresponding grader
     const graderToAssign = calculateGrader(submissionNumber);
+
+    console.log('graderToAssign is ', graderToAssign);
 
     // increase by 1
     graderToAssign.setNumToGrade(graderToAssign.getNumToGrade() + 1);
@@ -157,6 +160,7 @@ module.exports = (originalGraders, numSubmissions) => {
     numSubsLeft -= 1;
     // increase submissionNumber by subIntervalWidth
     submissionNumber += subIntervalWidth;
+    console.log('submissio nnumber is ', submissionNumber);
   }
 
   console.log('random graders returned is ', randomGraders);
