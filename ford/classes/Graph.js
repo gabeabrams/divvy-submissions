@@ -49,21 +49,23 @@ class Graph {
   }
 
   initiateGraph() {
-    const gradersNode = this.graders.map((grader) => {
-      // create a node for this grader
-      const graderNode = new Node('grader', grader);
-      // create an edge from source to this graderNode
+    const submissionNodes = this.submissions;
+    const graderNodes = this.graders;
+
+    graderNodes.forEach((graderNode) => {
+      // get grader object
+      const graderObject = graderNode.getMetadata();
+      // create edge from source to this graderNode
       const opts = {
         startNode: this.source,
         endNode: graderNode,
         weight: 0,
-        capacity: grader.getNumToGrade(),
+        capacity: graderObject.getNumToGrade(),
         flow: 0,
       };
 
       const edge = new Edge(opts);
       this.source.addOutgoingEdges(edge);
-      return graderNode;
     });
   }
 }
