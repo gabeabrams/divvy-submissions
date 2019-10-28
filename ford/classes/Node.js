@@ -42,10 +42,20 @@ class Node {
 
   /**
    * Set outgoing edges
-   * @param {Edge[]} studentIds - the new list of outgoing edges
+   * @param {Edge[]} newOutgoingEdges - the new list of outgoing edges
    */
   setOutgoingEdges(newOutgoingEdges) {
     this.outgoingEdges = newOutgoingEdges;
+  }
+
+  /**
+   * Add outgoing edges
+   * @param {Edge} edge - the edge added to the outgoing edges
+   */
+  addOutgoingEdges(edge) {
+    const curOutgoingEdges = this.outgoingEdges;
+    curOutgoingEdges.push(edge);
+    this.setOutgoingEdges(curOutgoingEdges);
   }
 
   /**
