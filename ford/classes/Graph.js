@@ -13,7 +13,7 @@ class Graph {
    */
   constructor(submissions, graders) {
     this.createSubmissionNodes(submissions);
-    console.log('this submissio mapping is ', this.submissionToNodeMapping);
+    console.log('this submission mapping is ', this.submissionToNodeMapping);
     this.createGraderNodes(graders);
     this.source = new Node('source');
     this.sink = new Node('sink');
@@ -33,6 +33,7 @@ class Graph {
       submissionToNodeMapping[submission] = submissionNode;
       return submissionNode;
     });
+    console.log('mapping here is ', submissionToNodeMapping);
     this.submissionToNodeMapping = submissionToNodeMapping;
   }
 
