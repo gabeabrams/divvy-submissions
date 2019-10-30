@@ -4,7 +4,7 @@ const Node = require('../../../ford/classes/Node');
 describe('classes > Node', function () {
   it('returns correct values for getter, setter function', async function () {
     // Create fake data
-    const type = 'sink';
+    const type = Node.TYPES.SINK;
     const metadata = {
       graderId: '132',
     };

@@ -3,7 +3,7 @@ class Node {
    * Create a new Node instance
    * @param {string} type - whether the node is source or sink or
    *   submission or grader
-   * @param {Null|Grader|Submission} metadata - the information stored in this
+   * @param {null|Grader|Submission} metadata - the information stored in this
    *   node. When the node is either source or sink, its metadata is null. If
    *   the node signifies either a grader or submission object, it stores the
    *   corresponding instance of that object
@@ -77,6 +77,14 @@ Node.getNextId = () => {
     Node.instanceCount ? Node.instanceCount + 1 : 1
   );
   return Node.instanceCount;
+};
+
+// Types of nodes
+Node.TYPES = {
+  SOURCE: 'source',
+  SINK: 'sink',
+  SUBMISSION: 'submission',
+  GRADER: 'grader',
 };
 
 module.exports = Node;

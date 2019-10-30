@@ -35,7 +35,7 @@ class Edge {
    * Get end node
    * @return {Node} the end node of this edge
    */
-  getendNode() {
+  getEndNode() {
     return this.endNode;
   }
 
