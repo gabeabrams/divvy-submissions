@@ -12,9 +12,9 @@ class Graph {
    * @param {Graders[]} graders - a list of graders
    */
   constructor(submissions, graders) {
-    this.submissions = this.createSubmissionNodes(submissions);
-    this.submissionToNodeMapping = {};
-    this.graders = this.createGraderNodes(graders);
+    this.createSubmissionNodes(submissions);
+    console.log('this submissio mapping is ', this.submissionToNodeMapping);
+    this.createGraderNodes(graders);
     this.source = new Node('source');
     this.sink = new Node('sink');
     this.initiateGraph();
@@ -31,9 +31,9 @@ class Graph {
       // create a node for this submission
       const submissionNode = new Node('submissions', submission);
       submissionToNodeMapping[submission] = submissionNode;
-      this.submissionToNodeMapping = submissionToNodeMapping;
       return submissionNode;
     });
+    this.submissionToNodeMapping = submissionToNodeMapping;
   }
 
   /**

@@ -40,7 +40,7 @@ describe('classes > Graph', function () {
       grader.setNumToGrade(2);
     });
 
-    const graph = new Graph(fakeGraders, fakeSubmissions);
-    console.log('graph is ', graph);
+    const graph = new Graph(fakeSubmissions, fakeGraders);
+    // console.log('graph is ', graph);
   });
 });
