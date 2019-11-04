@@ -136,7 +136,6 @@ class Graph {
     // If sink has been marked visited or if the smallest tentative distance
     // among the nodes in the unvisited set is infinity (no connection between
     // initial node and remaining unvisited nodes), stop
-
     while (
       isVisited[`${this.sink.getNodeId()}`] === undefined
         && Object.keys(unvisited).some(
@@ -217,15 +216,16 @@ class Graph {
     return null;
   }
 
-  // /**
-  //  * Run modified ford-fulkerson
-  //  */
-  // solve() {
-  //   // while path exists:
-  //   // run _findShortestPath
-  //   // update flow on that path
-  //   // return the pairings submission => grader and a list of violations
-  // }
+  /**
+   * Run modified ford-fulkerson
+   */
+  solve() {
+    // while path exists:
+    // run _findShortestPath
+    // update flow on that path
+    // return the pairings submission => grader and a list of violations
+    this._findShortestPath();
+  }
 }
 
 module.exports = Graph;
