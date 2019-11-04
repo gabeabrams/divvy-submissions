@@ -109,28 +109,26 @@ class Graph {
     const unvisited = {};
 
     for (let i = 0; i < this.graderNodes.length; i++) {
-      const nodeType = this.graderNodes[i].getNodeType();
       const nodeId = this.graderNodes[i].getNodeId();
-      unvisited[`${nodeType}=>${nodeId}`] = [
+      unvisited[`${nodeId}`] = [
         this.graderNodes[i],
         null,
       ];
     }
 
     for (let j = 0; j < this.submissionNodes.length; j++) {
-      const nodeType = this.submissionNodes[j].getNodeType();
       const nodeId = this.submissionNodes[j].getNodeId();
-      unvisited[`${nodeType}=>${nodeId}`] = [
+      unvisited[`${nodeId}`] = [
         this.submissionNodes[j],
         null,
       ];
     }
 
-    unvisited[`${this.source.getNodeType()}=>${this.source.getNodeId()}`] = [
+    unvisited[`${this.source.getNodeId()}`] = [
       this.source,
       0,
     ];
-    unvisited[`${this.sink.getNodeType()}=>${this.sink.getNodeId()}`] = [
+    unvisited[`${this.sink.getNodeId()}`] = [
       this.sink,
       null,
     ];
@@ -140,7 +138,7 @@ class Graph {
     // initial node and remaining unvisited nodes), stop
 
     while (
-      isVisited[`sink=>${this.sink.getNodeId()}`] === undefined
+      isVisited[`${this.sink.getNodeId()}`] === undefined
         && Object.keys(unvisited).some(
           (key) => { return unvisited[key] !== null; }
         )
@@ -162,6 +160,7 @@ class Graph {
       // Set the initial node as current.
       const current = unvisited[minKey];
       const curNode = current[0];
+      const curNodeKey = `${curNode.getNodeId()}`;
 
       // Consider all of its unvisited neighbours and calculate their
       // tentative distances through the current node.
@@ -170,12 +169,12 @@ class Graph {
       for (let i = 0; i < outgoingEdges.length; i++) {
         const weight = outgoingEdges[i].getWeight();
         const endNode = outgoingEdges[i].getEndNode();
-        const endNodeKey = `${endNode.getNodeType()}=>${endNode.getNodeId()}`;
+        const endNodeKey = `${endNode.getNodeId()}`;
 
         if (isVisited[endNodeKey] === undefined) {
           // if neighbor is not visited
           const tentativeDistance = (
-            unvisited[`${curNode.getNodeType()}=>${curNode.getNodeId()}`][1]
+            unvisited[curNodeKey][1]
            + weight
           );
 
@@ -183,12 +182,14 @@ class Graph {
           // assigned value and assign the smaller one.
           if (unvisited[endNodeKey][1] === null) {
             unvisited[endNodeKey][1] = tentativeDistance;
-          } else {
-            unvisited[endNodeKey][1] = (
-              (unvisited[endNodeKey][1] > tentativeDistance)
-                ? tentativeDistance
-                : unvisited[endNodeKey][1]
-            );
+            parentMap[endNodeKey] = outgoingEdges[i];
+          }
+          if (
+            unvisited[endNodeKey][1] !== null
+            && unvisited[endNodeKey][1] > tentativeDistance
+          ) {
+            unvisited[endNodeKey][1] = tentativeDistance;
+            parentMap[endNodeKey] = outgoingEdges[i];
           }
         }
       }
@@ -196,19 +197,24 @@ class Graph {
       // of the current node, mark the current node as visited
       // remove it from the unvisited set.
       // A visited node will never be checked again.
-      isVisited[`${curNode.getNodeType()}=>${curNode.getNodeId()}`] = true;
-      delete unvisited[`${curNode.getNodeType()}=>${curNode.getNodeId()}`];
-      console.log('unvisited is ', unvisited);
+      isVisited[`${curNode.getNodeId()}`] = true;
+      delete unvisited[`${curNode.getNodeId()}`];
     }
 
     // sink is visited, return the shortest path from source to sink
-    if (isVisited[`${this.sink.getNodeType()}=>${this.sink.getNodeId()}`]) {
-      console.log('hi');
-      return true;
+    if (isVisited[`${this.sink.getNodeId()}`]) {
+      const path = [];
+      path.push(this.sink);
+      let curKey = `${this.sink.getNodeId()}`;
+      while (parentMap[curKey] !== undefined) {
+        const parentNode = parentMap[curKey].getStartNode();
+        path.push(parentNode);
+        curKey = parentNode.getNodeId();
+      }
+      return path.reverse();
     }
-    console.log('ni');
     // path does not exist
-    return false;
+    return null;
   }
 
   // /**
