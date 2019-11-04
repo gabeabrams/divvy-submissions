@@ -71,7 +71,7 @@ class Graph {
           startNode: graderNode,
           endNode: submissionNode,
           weight: (
-            submissionIsAllowed
+            isAllowed
               ? 1
               : this.NOT_ALLOWED_WEIGHT
               // ^ Add high-weight edge because this pairing is not allowed
