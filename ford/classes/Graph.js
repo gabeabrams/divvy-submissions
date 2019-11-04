@@ -15,10 +15,6 @@ const createNodes = (items, type) => {
 };
 
 class Graph {
-  // - findPath (function) that runs a shortest path algorithm [NEXT WEEK]
-  // - _updateGraph (path) that updates the flow on the graph based on the path
-  //     that was found [NEXT WEEK]
-
   /**
    * Create a new Node instance
    * @param {Submission[]} submissions - a list of submissions
@@ -102,35 +98,122 @@ class Graph {
    * @return {Node[]|null} shortest path or null if no path exists
    */
   _findShortestPath() {
-    // TODO: Use Dijkstra's algorithm
-    // NOTE: do not modify the nodes or edges in any way
-
     // Mark all nodes unvisited.
     const isVisited = {}; // nodeId => true if visited
 
-    // TODO: Create a set of all the unvisited nodes called the unvisited set.
-
-    // TODO: Assign to every node a tentative distance value: set it to zero for our initial node (source) and to infinity (use null) for all other nodes. Set the initial node as current.
-    // Then, when checking distance, you need two checks: one to check if distance is null, and one to compare the numbers if they are not null
-
-    // TODO: For the current node, consider all of its unvisited neighbours and calculate their tentative distances through the current node. Compare the newly calculated tentative distance to the current assigned value and assign the smaller one. For example, if the current node A is marked with a distance of 6, and the edge connecting it with a neighbour B has length 2, then the distance to B through A will be 6 + 2 = 8. If B was previously marked with a distance greater than 8 then change it to 8. Otherwise, the current value will be kept.
-    // ^ Keep track of best parent
+    // Keep track of best parent
     const parentMap = {}; // nodeId => parentNodeId or null if none yet
 
-    // When we are done considering all of the unvisited neighbours of the current node, mark the current node as visited and remove it from the unvisited set. A visited node will never be checked again.
-    // If the destination node has been marked visited (when planning a route between two specific nodes) or if the smallest tentative distance among the nodes in the unvisited set is infinity (when planning a complete traversal; occurs when there is no connection between the initial node and remaining unvisited nodes), then stop. The algorithm has finished.
-    // Otherwise, select the unvisited node that is marked with the smallest tentative distance, set it as the new "current node", and go back to step 3.
+    // Assign to every node a tentative distance value: source is 0, others null
+    const unvisited = {};
+
+    for (let i = 0; i < this.graderNodes.length; i++) {
+      unvisited[`${this.graderNodes[i].getNodeType()}=>${this.graderNodes[i].getNodeId()}`] = [
+        this.graderNodes[i],
+        null,
+      ];
+    }
+
+    for (let j = 0; j < this.submissionNodes.length; j++) {
+      unvisited[`${this.submissionNodes[j].getNodeType()}=>${this.submissionNodes[j].getNodeId()}`] = [
+        this.submissionNodes[j],
+        null,
+      ];
+    }
+
+    unvisited[`${this.source.getNodeType()}=>${this.source.getNodeId()}`] = [
+      this.source,
+      0,
+    ];
+    unvisited[`${this.sink.getNodeType()}=>${this.sink.getNodeId()}`] = [
+      this.sink,
+      null,
+    ];
+
+    // If sink has been marked visited or if the smallest tentative distance
+    // among the nodes in the unvisited set is infinity (no connection between
+    // initial node and remaining unvisited nodes), stop
+
+    while (
+      !isVisited(`${this.sink.getNodeType()}=>${this.sink.getNodeId()}`)
+        && Object.keys(unvisited).some(
+          (key) => { return unvisited[key] === null; }
+        )
+    ) {
+      // Otherwise, select the unvisited node that is marked with the
+    // smallest tentative distance, set it as the new current node
+      let minKey = '';
+      let minDist = Infinity;
+      const keys = Object.keys(unvisited);
+      for (let i = 0; i < keys.length; i++) {
+        if (unvisited[keys[i]] !== null) {
+          if (unvisited[keys[i]] < minDist) {
+            minDist = unvisited[keys[i]];
+            minKey = keys[i];
+          }
+        }
+      }
+
+      // Set the initial node as current.
+      const current = unvisited[minKey];
+      const curNode = current[0];
+
+      // Consider all of its unvisited neighbours and calculate their
+      // tentative distances through the current node.
+      const outgoingEdges = curNode.getOutgoingEdges();
+
+      for (let i = 0; i < outgoingEdges.length; i++) {
+        const weight = outgoingEdges[i].getWeight();
+        const endNode = outgoingEdges[i].getEndNode();
+
+        if (!isVisited[`${endNode.getNodeType()}=>${endNode.getNodeId()}`]) {
+        // if neighbor is not visited
+          const tentativeDistance = (
+            unvisited[`${curNode.getNodeType()}=>${curNode.getNodeId()}`]
+           + weight
+          );
+
+          const endNodeKey = `${endNode.getNodeType()}=>${endNode.getNodeId()}`;
+
+          // Compare the newly calculated tentative distance to the current
+          // assigned value and assign the smaller one.
+          if (unvisited[endNodeKey] === null) {
+            unvisited[endNodeKey] = tentativeDistance;
+          } else {
+            unvisited[endNodeKey] = (
+              (unvisited[endNodeKey] > tentativeDistance)
+                ? tentativeDistance
+                : unvisited[endNodeKey]
+            );
+          }
+        }
+      }
+
+      // When we are done considering all of the unvisited neighbours
+      // of the current node, mark the current node as visited
+      // remove it from the unvisited set.
+      // A visited node will never be checked again.
+      isVisited[`${curNode.getNodeType()}=>${curNode.getNodeId()}`] = true;
+      unvisited.delete(`${curNode.getNodeType()}=>${curNode.getNodeId()}`);
+    }
+
+    // sink is visited, return the shortest path from source to sink
+    if (isVisited(`${this.sink.getNodeType()}=>${this.sink.getNodeId()}`)) {
+      return path;
+    }
+    // path does not exist
+    return false;
   }
 
-  /**
-   * Run modified ford-fulkerson
-   */
-  solve() {
-    // while path exists:
-      // run _findShortestPath
-      // update flow on that path
-    // return the pairings submission => grader and a list of violations
-  }
+  // /**
+  //  * Run modified ford-fulkerson
+  //  */
+  // solve() {
+  //   // while path exists:
+  //   // run _findShortestPath
+  //   // update flow on that path
+  //   // return the pairings submission => grader and a list of violations
+  // }
 }
 
 module.exports = Graph;
