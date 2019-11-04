@@ -4,7 +4,7 @@ const Grader = require('../../../classes/Grader');
 const Submission = require('../../../classes/Submission');
 
 describe('classes > Graph', function () {
-  it('returns correct values for getter, setter function', async function () {
+  it.only('returns correct values for getter, setter function', async function () {
     // create fake data
     const fakeSubmissions = [
       new Submission([1], true), // id: 1
