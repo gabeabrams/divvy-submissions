@@ -4,7 +4,7 @@ const Grader = require('../../../classes/Grader');
 const Submission = require('../../../classes/Submission');
 
 describe('classes > Graph', function () {
-  it.only('returns correct values for getter, setter function', async function () {
+  it('returns correct values for getter, setter function', async function () {
     // create fake data
     const fakeSubmissions = [
       new Submission([1], true), // id: 1
@@ -31,13 +31,53 @@ describe('classes > Graph', function () {
     });
 
     const fakeGraders = [
-      new Grader(1, allowedSubsGraderTwo, 1),
+      new Grader(1, allowedSubsGraderOne, 1),
       new Grader(2, allowedSubsGraderTwo, 1),
     ];
 
     // set num to grade manually to 2 submissions per grader
     fakeGraders.forEach((grader) => {
       grader.setNumToGrade(2);
+    });
+
+    const graph = new Graph(fakeSubmissions, fakeGraders);
+    // console.log('graph is ', graph);
+  });
+
+  it.only('returns null if no path found', async function () {
+    // create fake data
+    const fakeSubmissions = [
+      new Submission([1], true), // id: 1
+      new Submission([2], true), // id: 2
+      new Submission([3], true), // id: 3
+      new Submission([4], true), // id: 4
+    ];
+
+    const allowedSubsGraderOne = [];
+    const allowedSubsGraderTwo = [];
+    // construct allowedSubs for each grader
+    fakeSubmissions.forEach((sub, i) => {
+      // only grader two is allowed to grade sub id: 3
+      if (i + 1 === 3) {
+        allowedSubsGraderTwo.push(sub);
+      } else if (i + 1 === 4) {
+        // only grader 1 is allowed to grade sub id: 4
+        allowedSubsGraderOne.push(sub);
+      } else {
+        // both are allowed to grade sub id: 1 and id: 2
+        allowedSubsGraderOne.push(sub);
+        allowedSubsGraderTwo.push(sub);
+      }
+    });
+
+    const fakeGraders = [
+      new Grader(1, allowedSubsGraderOne, 1),
+      new Grader(2, allowedSubsGraderTwo, 1),
+    ];
+
+    // set num to grade manually to 2 submissions per grader
+    fakeGraders.forEach((grader) => {
+      grader.setNumToGrade(0);
     });
 
     const graph = new Graph(fakeSubmissions, fakeGraders);

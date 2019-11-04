@@ -139,7 +139,7 @@ class Graph {
     while (
       isVisited[`${this.sink.getNodeId()}`] === undefined
         && Object.keys(unvisited).some(
-          (key) => { return unvisited[key] !== null; }
+          (key) => { return unvisited[key][1] !== null; }
         )
     ) {
       // Otherwise, select the unvisited node that is marked with the
@@ -156,6 +156,8 @@ class Graph {
         }
       }
 
+      console.log('minKey is ', minKey);
+
       // Set the initial node as current.
       const current = unvisited[minKey];
       const curNode = current[0];
@@ -166,6 +168,9 @@ class Graph {
       const outgoingEdges = curNode.getOutgoingEdges();
 
       for (let i = 0; i < outgoingEdges.length; i++) {
+        if (outgoingEdges[i].getFlow() === outgoingEdges[i].getCapacity()) {
+          continue;
+        }
         const weight = outgoingEdges[i].getWeight();
         const endNode = outgoingEdges[i].getEndNode();
         const endNodeKey = `${endNode.getNodeId()}`;
@@ -213,6 +218,7 @@ class Graph {
       return path.reverse();
     }
     // path does not exist
+    console.log('returned null');
     return null;
   }
 
@@ -220,10 +226,12 @@ class Graph {
    * Run modified ford-fulkerson
    */
   solve() {
-    // while path exists:
-    // run _findShortestPath
+    // while path exists, run _findShortestPath
     // update flow on that path
     // return the pairings submission => grader and a list of violations
+
+
+    // how are we implementing reverse edges??
     this._findShortestPath();
   }
 }
