@@ -30,6 +30,7 @@ class Graph {
     this.source = new Node(Node.TYPES.SOURCE);
     this.sink = new Node(Node.TYPES.SINK);
     this._initiateGraph();
+    this._findShortestPath();
   }
 
   /**
@@ -108,14 +109,18 @@ class Graph {
     const unvisited = {};
 
     for (let i = 0; i < this.graderNodes.length; i++) {
-      unvisited[`${this.graderNodes[i].getNodeType()}=>${this.graderNodes[i].getNodeId()}`] = [
+      const nodeType = this.graderNodes[i].getNodeType();
+      const nodeId = this.graderNodes[i].getNodeId();
+      unvisited[`${nodeType}=>${nodeId}`] = [
         this.graderNodes[i],
         null,
       ];
     }
 
     for (let j = 0; j < this.submissionNodes.length; j++) {
-      unvisited[`${this.submissionNodes[j].getNodeType()}=>${this.submissionNodes[j].getNodeId()}`] = [
+      const nodeType = this.submissionNodes[j].getNodeType();
+      const nodeId = this.submissionNodes[j].getNodeId();
+      unvisited[`${nodeType}=>${nodeId}`] = [
         this.submissionNodes[j],
         null,
       ];
@@ -135,20 +140,20 @@ class Graph {
     // initial node and remaining unvisited nodes), stop
 
     while (
-      !isVisited(`${this.sink.getNodeType()}=>${this.sink.getNodeId()}`)
+      isVisited[`sink=>${this.sink.getNodeId()}`] === undefined
         && Object.keys(unvisited).some(
-          (key) => { return unvisited[key] === null; }
+          (key) => { return unvisited[key] !== null; }
         )
     ) {
       // Otherwise, select the unvisited node that is marked with the
-    // smallest tentative distance, set it as the new current node
+      // smallest tentative distance, set it as the new current node
       let minKey = '';
       let minDist = Infinity;
       const keys = Object.keys(unvisited);
       for (let i = 0; i < keys.length; i++) {
-        if (unvisited[keys[i]] !== null) {
-          if (unvisited[keys[i]] < minDist) {
-            minDist = unvisited[keys[i]];
+        if (unvisited[keys[i]][1] !== null) {
+          if (unvisited[keys[i]][1] < minDist) {
+            minDist = unvisited[keys[i]][1];
             minKey = keys[i];
           }
         }
@@ -165,42 +170,43 @@ class Graph {
       for (let i = 0; i < outgoingEdges.length; i++) {
         const weight = outgoingEdges[i].getWeight();
         const endNode = outgoingEdges[i].getEndNode();
+        const endNodeKey = `${endNode.getNodeType()}=>${endNode.getNodeId()}`;
 
-        if (!isVisited[`${endNode.getNodeType()}=>${endNode.getNodeId()}`]) {
-        // if neighbor is not visited
+        if (isVisited[endNodeKey] === undefined) {
+          // if neighbor is not visited
           const tentativeDistance = (
-            unvisited[`${curNode.getNodeType()}=>${curNode.getNodeId()}`]
+            unvisited[`${curNode.getNodeType()}=>${curNode.getNodeId()}`][1]
            + weight
           );
 
-          const endNodeKey = `${endNode.getNodeType()}=>${endNode.getNodeId()}`;
-
           // Compare the newly calculated tentative distance to the current
           // assigned value and assign the smaller one.
-          if (unvisited[endNodeKey] === null) {
-            unvisited[endNodeKey] = tentativeDistance;
+          if (unvisited[endNodeKey][1] === null) {
+            unvisited[endNodeKey][1] = tentativeDistance;
           } else {
-            unvisited[endNodeKey] = (
-              (unvisited[endNodeKey] > tentativeDistance)
+            unvisited[endNodeKey][1] = (
+              (unvisited[endNodeKey][1] > tentativeDistance)
                 ? tentativeDistance
-                : unvisited[endNodeKey]
+                : unvisited[endNodeKey][1]
             );
           }
         }
       }
-
       // When we are done considering all of the unvisited neighbours
       // of the current node, mark the current node as visited
       // remove it from the unvisited set.
       // A visited node will never be checked again.
       isVisited[`${curNode.getNodeType()}=>${curNode.getNodeId()}`] = true;
-      unvisited.delete(`${curNode.getNodeType()}=>${curNode.getNodeId()}`);
+      delete unvisited[`${curNode.getNodeType()}=>${curNode.getNodeId()}`];
+      console.log('unvisited is ', unvisited);
     }
 
     // sink is visited, return the shortest path from source to sink
-    if (isVisited(`${this.sink.getNodeType()}=>${this.sink.getNodeId()}`)) {
-      return path;
+    if (isVisited[`${this.sink.getNodeType()}=>${this.sink.getNodeId()}`]) {
+      console.log('hi');
+      return true;
     }
+    console.log('ni');
     // path does not exist
     return false;
   }
