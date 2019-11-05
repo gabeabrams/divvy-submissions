@@ -156,8 +156,6 @@ class Graph {
         }
       }
 
-      console.log('minKey is ', minKey);
-
       // Set the initial node as current.
       const current = unvisited[minKey];
       const curNode = current[0];
@@ -169,6 +167,7 @@ class Graph {
 
       for (let i = 0; i < outgoingEdges.length; i++) {
         if (outgoingEdges[i].getFlow() === outgoingEdges[i].getCapacity()) {
+          // eslint-disable-next-line no-continue
           continue;
         }
         const weight = outgoingEdges[i].getWeight();
