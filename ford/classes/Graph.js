@@ -77,6 +77,8 @@ class Graph {
           flow: 0,
         });
         graderNode.addOutgoingEdges(graderToSubmissionEdge);
+
+        // TODO: add reverse edges going from submission to grader with a link to ^^ that edge
       });
     });
 
@@ -96,126 +98,118 @@ class Graph {
   /**
    * Runs a shortest path algorithm on the graph, returning an array of nodes
    *   in the shortest path or null if no path exists
-   * @return {Node[]|null} shortest path or null if no path exists
+   * @return {Edge[]|null} shortest path or null if no path exists
    */
   _findShortestPath() {
     // Mark all nodes unvisited.
     const isVisited = {}; // nodeId => true if visited
 
     // Keep track of best parent
-    const parentMap = {}; // nodeId => parentNodeId or null if none yet
+    const edgeToParentMap = {}; // nodeId => edge to parent or null if none yet
 
-    // Assign to every node a tentative distance value: source is 0, others null
-    const unvisited = {};
+    // Tentative distances
+    const tentativeDistanceMap = {};
+    // ^ nodeId => tentativeDistance or undefined if node hasn't been discovered
 
-    for (let i = 0; i < this.graderNodes.length; i++) {
-      const nodeId = this.graderNodes[i].getNodeId();
-      unvisited[`${nodeId}`] = [
-        this.graderNodes[i],
-        null,
-      ];
-    }
+    // Set distance of source to 0
+    tentativeDistanceMap[this.source.getNodeId()] = 0;
 
-    for (let j = 0; j < this.submissionNodes.length; j++) {
-      const nodeId = this.submissionNodes[j].getNodeId();
-      unvisited[`${nodeId}`] = [
-        this.submissionNodes[j],
-        null,
-      ];
-    }
-
-    unvisited[`${this.source.getNodeId()}`] = [
-      this.source,
-      0,
+    // Node lookup
+    const nodeIdToNode = {}; // nodeId => node
+    const nodeArrays = [
+      this.graderNodes,
+      this.submissionNodes,
+      [this.source, this.sink],
     ];
-    unvisited[`${this.sink.getNodeId()}`] = [
-      this.sink,
-      null,
-    ];
+    nodeArrays.forEach((nodeArray) => {
+      nodeArray.forEach((node) => {
+        nodeIdToNode[node.getNodeId()] = node;
+      });
+    });
 
     // If sink has been marked visited or if the smallest tentative distance
     // among the nodes in the unvisited set is infinity (no connection between
     // initial node and remaining unvisited nodes), stop
     while (
-      isVisited[`${this.sink.getNodeId()}`] === undefined
-        && Object.keys(unvisited).some(
-          (key) => { return unvisited[key][1] !== null; }
-        )
+      !isVisited[this.sink.getNodeId()]
+      && Object.values(tentativeDistanceMap).some((tentativeDistance) => {
+        return (tentativeDistance !== undefined);
+      })
     ) {
       // Otherwise, select the unvisited node that is marked with the
       // smallest tentative distance, set it as the new current node
-      let minKey = '';
-      let minDist = Infinity;
-      const keys = Object.keys(unvisited);
-      for (let i = 0; i < keys.length; i++) {
-        if (unvisited[keys[i]][1] !== null) {
-          if (unvisited[keys[i]][1] < minDist) {
-            minDist = unvisited[keys[i]][1];
-            minKey = keys[i];
-          }
+      let closestNode;
+      let minDistance = Infinity;
+      Object.keys(tentativeDistanceMap).forEach((nodeId) => {
+        const tentativeDistance = tentativeDistanceMap[nodeId];
+        if (
+          tentativeDistance !== undefined
+          && tentativeDistance < minDistance
+        ) {
+          closestNode = nodeIdToNode[nodeId];
+          minDistance = tentativeDistance;
         }
-      }
+      });
 
       // Set the initial node as current.
-      const current = unvisited[minKey];
-      const curNode = current[0];
-      const curNodeKey = `${curNode.getNodeId()}`;
+      const currentNode = closestNode;
 
       // Consider all of its unvisited neighbours and calculate their
       // tentative distances through the current node.
-      const outgoingEdges = curNode.getOutgoingEdges();
+      const outgoingEdges = currentNode.getOutgoingEdges();
 
-      for (let i = 0; i < outgoingEdges.length; i++) {
-        if (outgoingEdges[i].getFlow() === outgoingEdges[i].getCapacity()) {
-          // eslint-disable-next-line no-continue
-          continue;
-        }
-        const weight = outgoingEdges[i].getWeight();
-        const endNode = outgoingEdges[i].getEndNode();
-        const endNodeKey = `${endNode.getNodeId()}`;
+      // eslint-disable-next-line no-loop-func
+      outgoingEdges.forEach((outgoingEdge) => {
+        if (outgoingEdge.canCross()) {
+          const weight = outgoingEdge.getWeight();
+          const endNode = outgoingEdge.getEndNode();
 
-        if (isVisited[endNodeKey] === undefined) {
-          // if neighbor is not visited
-          const tentativeDistance = (
-            unvisited[curNodeKey][1]
-           + weight
-          );
+          if (!isVisited[endNode.getNodeId()]) {
+            // if neighbor is not visited
+            const newTentativeDistance = (
+              tentativeDistanceMap[currentNode.getNodeId()]
+              + weight
+            );
 
-          // Compare the newly calculated tentative distance to the current
-          // assigned value and assign the smaller one.
-          if (unvisited[endNodeKey][1] === null) {
-            unvisited[endNodeKey][1] = tentativeDistance;
-            parentMap[endNodeKey] = outgoingEdges[i];
-          }
-          if (
-            unvisited[endNodeKey][1] !== null
-            && unvisited[endNodeKey][1] > tentativeDistance
-          ) {
-            unvisited[endNodeKey][1] = tentativeDistance;
-            parentMap[endNodeKey] = outgoingEdges[i];
+            // Compare the newly calculated tentative distance to the current
+            // assigned value and assign the smaller one.
+            const oldTentativeDistance = (
+              tentativeDistanceMap[endNode.getNodeId()]
+            );
+            const foundBetterParent = (
+              oldTentativeDistance === undefined
+              || oldTentativeDistance > newTentativeDistance
+            );
+            if (foundBetterParent) {
+              tentativeDistanceMap[endNode.getNodeId()] = newTentativeDistance;
+              edgeToParentMap[endNode.getNodeId()] = outgoingEdge;
+            }
           }
         }
-      }
+      });
       // When we are done considering all of the unvisited neighbours
       // of the current node, mark the current node as visited
       // remove it from the unvisited set.
       // A visited node will never be checked again.
-      isVisited[`${curNode.getNodeId()}`] = true;
-      delete unvisited[`${curNode.getNodeId()}`];
+      isVisited[currentNode.getNodeId()] = true;
+      // > Remove from fringe
+      delete tentativeDistanceMap[currentNode.getNodeId()];
     }
 
-    // sink is visited, return the shortest path from source to sink
-    if (isVisited[`${this.sink.getNodeId()}`]) {
-      const path = [];
-      path.push(this.sink);
-      let curKey = `${this.sink.getNodeId()}`;
-      while (parentMap[curKey] !== undefined) {
-        const parentNode = parentMap[curKey].getStartNode();
-        path.push(parentNode);
-        curKey = parentNode.getNodeId();
+    // If sink is visited, return the shortest path from source to sink
+    if (isVisited[this.sink.getNodeId()]) {
+      const edgePath = [];
+      let currentNodeId = this.sink.getNodeId();
+      while (edgeToParentMap[currentNodeId]) {
+        const edge = edgeToParentMap[currentNodeId];
+        // Add this edge
+        edgePath.unshift(edge);
+        // Move to next parent
+        currentNodeId = edge.getStartNode().getNodeId();
       }
-      return path.reverse();
+      return edgePath;
     }
+
     // path does not exist
     console.log('returned null');
     return null;
@@ -226,7 +220,7 @@ class Graph {
    */
   solve() {
     // while path exists, run _findShortestPath
-    // update flow on that path
+    // update flow on that path (for each edge in the edgePath, call edge.updateFlow())
     // return the pairings submission => grader and a list of violations
 
 

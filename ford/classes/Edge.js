@@ -16,11 +16,28 @@ class Edge {
       flow,
     } = opts;
 
+    this.id = Edge.getNextId();
     this.startNode = startNode;
     this.endNode = endNode;
     this.weight = weight;
     this.capacity = capacity;
     this.flow = flow;
+  }
+
+  /**
+   * Get id
+   * @return {number} the edge's id
+   */
+  getEdgeId() {
+    return this.id;
+  }
+
+  /**
+   * Returns true if we are allowed to add flow to this edge
+   * @return {boolean} true if can cross
+   */
+  canCross() {
+    return (this.flow < this.capacity);
   }
 
   /**
@@ -78,6 +95,25 @@ class Edge {
   setFlow(newFlow) {
     this.flow = newFlow;
   }
+
+  /**
+   * Updates the flow on this edge
+   */
+  updateFlow() {
+    this.flow += 1;
+  }
 }
+
+/**
+ * Generate a new unique node id
+ * @return {number} the unique id for this node,
+ *    generated in increasing order
+ */
+Edge.getNextId = () => {
+  Edge.instanceCount = (
+    Edge.instanceCount ? Edge.instanceCount + 1 : 1
+  );
+  return Edge.instanceCount;
+};
 
 module.exports = Edge;
