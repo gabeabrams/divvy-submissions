@@ -22,11 +22,29 @@ class ReverseEdge {
     this.actualEdge.setFlow(this.actualEdge.getFlow() - 1);
   }
 
-  // TODO: getWeight return actual weight
+  /**
+   * Get the weight of the actual edge
+   * @return {number} the weight of the actual edge
+   */
+  getWeight() {
+    return this.actualEdge.getWeight();
+  }
 
-  // TODO: getEndNode return start node of actual edge
+  /**
+   * Get start node for the reverse edge
+   * @return {Node} the end node of the actual edge
+   */
+  getStartNode() {
+    return this.actualEdge.getEndNode();
+  }
 
-  // TODO: getStartNode return end node of actual edge
+  /**
+   * Get end node for the reverse edge
+   * @return {Node} the start node of the actual edge
+   */
+  getEndNode() {
+    return this.actualEdge.getStartNode();
+  }
 }
 
 module.exports = ReverseEdge;
