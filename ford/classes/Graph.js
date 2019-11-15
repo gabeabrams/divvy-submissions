@@ -1,5 +1,6 @@
 const Node = require('./Node');
 const Edge = require('./Edge');
+const ReverseEdge = require('./ReverseEdge');
 
 /**
 * Convert list of metadata items into nodes
@@ -78,7 +79,9 @@ class Graph {
         });
         graderNode.addOutgoingEdges(graderToSubmissionEdge);
 
-        // TODO: add reverse edges going from submission to grader with a link to ^^ that edge
+        // Create corresponding reverse edge from submissionNode to graderNode
+        const submissionToGraderEdge = new ReverseEdge(graderToSubmissionEdge);
+        submissionNode.addOutgoingEdges(submissionToGraderEdge);
       });
     });
 
@@ -187,6 +190,7 @@ class Graph {
           }
         }
       });
+
       // When we are done considering all of the unvisited neighbours
       // of the current node, mark the current node as visited
       // remove it from the unvisited set.

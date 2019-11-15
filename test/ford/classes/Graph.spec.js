@@ -81,6 +81,5 @@ describe('classes > Graph', function () {
     });
 
     const graph = new Graph(fakeSubmissions, fakeGraders);
-    // console.log('graph is ', graph);
   });
 });
