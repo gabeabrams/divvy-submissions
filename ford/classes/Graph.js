@@ -223,8 +223,6 @@ class Graph {
     // update flow on that path (for each edge in the edgePath, call edge.updateFlow())
     // return the pairings submission => grader and a list of violations
 
-
-    // how are we implementing reverse edges??
     this._findShortestPath();
   }
 }
