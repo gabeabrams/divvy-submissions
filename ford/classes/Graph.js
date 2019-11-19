@@ -31,7 +31,6 @@ class Graph {
     this.source = new Node(Node.TYPES.SOURCE);
     this.sink = new Node(Node.TYPES.SINK);
     this._initiateGraph();
-    this._findShortestPath();
   }
 
   /**
@@ -196,6 +195,7 @@ class Graph {
       // remove it from the unvisited set.
       // A visited node will never be checked again.
       isVisited[currentNode.getNodeId()] = true;
+
       // > Remove from fringe
       delete tentativeDistanceMap[currentNode.getNodeId()];
     }
@@ -211,11 +211,11 @@ class Graph {
         // Move to next parent
         currentNodeId = edge.getStartNode().getNodeId();
       }
+      console.log('edge path is ', edgePath);
       return edgePath;
     }
 
     // path does not exist
-    console.log('returned null');
     return null;
   }
 
@@ -223,11 +223,40 @@ class Graph {
    * Run modified ford-fulkerson
    */
   solve() {
+    const pairings = {}; // submission => grader pairings
+    const violations = {}; // edge => violation message
     // while path exists, run _findShortestPath
-    // update flow on that path (for each edge in the edgePath, call edge.updateFlow())
-    // return the pairings submission => grader and a list of violations
+    let shortestPath = this._findShortestPath();
+    while (shortestPath !== null) {
+      shortestPath.forEach((edge) => {
+        // update flow for each edge on the shortest path returned
+        edge.updateFlow();
+        // When startNode is grader, endNode is submission: Pair is formed
+        if (
+          edge.getStartNode().getNodeType() === Node.TYPES.GRADER
+          && edge.getEndNode().getNodeType() === Node.TYPES.SUBMISSION
+        ) {
+          pairings[
+            edge
+              .getEndNode()
+              .getMetadata()
+              .getSubmissionId()
+          ] = (
+            edge
+              .getStartNode()
+              .getMetadata()
+              .getId()
+          );
+        }
+      });
+      // run _findShortestPath again
+      shortestPath = this._findShortestPath();
+    }
 
-    this._findShortestPath();
+    // before returning pairings, go through and find violations
+
+    // return the pairings submission => grader and a list of violations
+    return pairings;
   }
 }
 
