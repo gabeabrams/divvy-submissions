@@ -12,8 +12,10 @@ const Grader = require('../classes/Grader');
  * @param {object[]} [requiredPairs] - a list of pairs in the form
  *   { grader: <grader id>, student: <student id> } where in each pair, the
  *   specified grader must grade the specified student
- * @return {Grader[]} list of grader instances with allowedSubs defined but
- *   numToGrade not defined yet
+ * @return {object} results in form { graders, violationMap } where
+ *   graders is a list of grader instances with allowedSubs defined but
+ *   numToGrade not defined yet and violationMap is a map
+ *   { submissionId => graderId => violationObj }
  */
 module.exports = (opts) => {
   // deconstruct opts
@@ -24,6 +26,14 @@ module.exports = (opts) => {
   } = opts;
 
   let { requiredPairs } = opts;
+
+  const violationMap = {}; // submissionId => graderId => violationObj
+  const addViolation = (submissionId, graderId, violation) => {
+    if (!violationMap[submissionId]) {
+      violationMap[submissionId] = {};
+    }
+    violationMap[submissionId][graderId] = violation;
+  };
 
   // pre processing constraints
   // check if there exist impossible required grader constraints
@@ -53,6 +63,7 @@ module.exports = (opts) => {
   });
 
   // create map to easily access grader object through their id
+  // Initialize allowed submissions to *all* submissions
   const graderIdToGraderMapping = {};
   graders.forEach((grader) => {
     graderIdToGraderMapping[grader.id] = new Grader(
@@ -65,14 +76,29 @@ module.exports = (opts) => {
   // process banned pairs, remove the submission that contains the student
   // from the graders allowed grading list
   bannedPairs.forEach((bannedPair) => {
-    const { grader, student } = bannedPair;
+    const graderId = bannedPair.grader;
+    const studentId = bannedPair.student;
+    const grader = graderIdToGraderMapping[graderId];
 
     const newAllowedSubmissions = (
-      graderIdToGraderMapping[grader].getAllowedSubmissions().filter((sub) => {
-        return !(sub.getStudentIds()).includes(student);
-      }));
+      grader.getAllowedSubmissions().filter((sub) => {
+        const pairAllowed = !(sub.getStudentIds()).includes(studentId);
 
-    graderIdToGraderMapping[grader].setAllowedSubmissions(
+        if (!pairAllowed) {
+          // Add a violation if this pair is assigned
+          const violation = {
+            type: 'banned',
+            listOfStudentsInvolved: sub.getStudentIds(),
+            listOfGradersInvolved: graderId,
+          };
+          addViolation(sub.getSubmissionId(), grader.getId(), violation);
+        }
+
+        return pairAllowed;
+      })
+    );
+
+    grader.setAllowedSubmissions(
       newAllowedSubmissions
     );
   });
@@ -92,7 +118,19 @@ module.exports = (opts) => {
           graderIdToGraderMapping[id].getAllowedSubmissions()
         );
         const newAllowedSubs = allowedSubmissions.filter((sub) => {
-          return !sub.getStudentIds().includes(studentId);
+          const pairAllowed = !sub.getStudentIds().includes(studentId);
+
+          if (!pairAllowed) {
+            // Add a violation if this pair is assigned
+            const violation = {
+              type: 'required',
+              listOfStudentsInvolved: sub.getStudentIds(),
+              listOfGradersInvolved: graderId,
+            };
+            addViolation(sub.getSubmissionId(), id, violation);
+          }
+
+          return pairAllowed;
         });
         // set new allowed submissions
         graderIdToGraderMapping[id].setAllowedSubmissions(newAllowedSubs);
@@ -100,5 +138,8 @@ module.exports = (opts) => {
     });
   });
 
-  return Object.values(graderIdToGraderMapping);
+  return {
+    graders: Object.values(graderIdToGraderMapping),
+    violationMap,
+  };
 };

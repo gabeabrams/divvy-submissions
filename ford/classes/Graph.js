@@ -211,7 +211,6 @@ class Graph {
         // Move to next parent
         currentNodeId = edge.getStartNode().getNodeId();
       }
-      console.log('edge path is ', edgePath);
       return edgePath;
     }
 
@@ -221,42 +220,62 @@ class Graph {
 
   /**
    * Run modified ford-fulkerson
+   * @return {object} results of pairing in the form { pairings, violations }
+   *   where pairings is a map { submissionId => graderId } and violations is
+   *   an array of pairs { submissionId, graderId }
    */
   solve() {
-    const pairings = {}; // submission => grader pairings
-    const violations = {}; // edge => violation message
     // while path exists, run _findShortestPath
     let shortestPath = this._findShortestPath();
     while (shortestPath !== null) {
       shortestPath.forEach((edge) => {
         // update flow for each edge on the shortest path returned
         edge.updateFlow();
-        // When startNode is grader, endNode is submission: Pair is formed
-        if (
-          edge.getStartNode().getNodeType() === Node.TYPES.GRADER
-          && edge.getEndNode().getNodeType() === Node.TYPES.SUBMISSION
-        ) {
-          pairings[
-            edge
-              .getEndNode()
-              .getMetadata()
-              .getSubmissionId()
-          ] = (
-            edge
-              .getStartNode()
-              .getMetadata()
-              .getId()
-          );
-        }
       });
       // run _findShortestPath again
       shortestPath = this._findShortestPath();
     }
 
-    // before returning pairings, go through and find violations
+    // Find pairings and violations
+    const pairings = {}; // submissionId => graderId
+    const violations = []; // edge => { submissionId, graderId }
+    this.graderNodes.forEach((graderNode) => {
+      // Get pairings
+      const graderId = (
+        graderNode
+          .getMetadata()
+          .getId()
+      );
+      graderNode.getOutgoingEdges().forEach((edge) => {
+        // Make sure this edge has flow on it
+        if (edge.getFlow() === 0) {
+          // This edge does not represent an assignment. Skip it
+          return;
+        }
 
-    // return the pairings submission => grader and a list of violations
-    return pairings;
+        const submissionId = (
+          edge
+            .getEndNode()
+            .getMetadata()
+            .getSubmissionId()
+        );
+        pairings[submissionId] = graderId;
+
+        const isViolation = (edge.getWeight() === this.NOT_ALLOWED_WEIGHT);
+        if (isViolation) {
+          violations.push({
+            submissionId,
+            graderId,
+          });
+        }
+      });
+    });
+
+    // Return results
+    return {
+      pairings,
+      violations,
+    };
   }
 }
 

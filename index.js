@@ -1,3 +1,12 @@
+// 1. Create submissions
+const createSubmissions = require('./helpers/createSubmissions');
+// 2. Redefine constraints
+const redefineConstraints = require('./helpers/redefineConstraints');
+// 3. Calculate workloads
+const calculateWorkloads = require('./helpers/calculateWorkloads');
+// 4. Solve
+const solve = require('./ford');
+
 /**
  * Divvy up submissions to graders
  * @param {object[]} students - the full list of student entries in the form:
@@ -27,16 +36,19 @@
  *   violations to the bannedPairs and requiredPairs constraints that we had to
  *   break in order to assign all submissions to graders in the form:
  *   {
- *     description: <english description of violation>,
- *     type: 'banned' or 'required'>,
+ *     type: <'banned' or 'required'>,
  *     listOfStudentsInvolved: <array of student ids>,
  *     listOfGradersInvolved: <array of grader ids>,
  *   }
  */
 module.exports = (opts) => {
-  // TODO: implement
+  // 1. Create submissions
 
-  /* -------------------- 1. Create Submissions ------------------- */
+  // 2. Redefine constraints
 
-  /* ------------------- 2. Redefine Constraints ------------------ */
+  // 3. Calculate workloads
+
+  // 4. Solve
+
+  // 5. Post-process: reformat pairings and violations to create the results obj
 };

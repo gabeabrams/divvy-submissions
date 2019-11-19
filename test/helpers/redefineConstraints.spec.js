@@ -3,7 +3,8 @@ const Submission = require('../../classes/Submission');
 const redifineConstraints = require('../../helpers/redefineConstraints');
 
 describe('helpers > redefineConstraints', function () {
-  it('returns correct graders after redefining constraints', async function () {
+  // TODO: create a test (OR ADD TO A TEST) that tests out the violationsMap
+  it.only('returns correct graders after redefining constraints', async function () {
     // create fake data
     const fakeSubmissions = [
       new Submission([1, 2], true),
@@ -51,7 +52,7 @@ describe('helpers > redefineConstraints', function () {
       requiredPairs: fakeRequiredPairs,
     };
 
-    const graders = redifineConstraints(opts);
+    const { graders } = redifineConstraints(opts);
 
     // based on our fake data, the expected output is listed below
     const expectedGraders = [
@@ -161,7 +162,7 @@ describe('helpers > redefineConstraints', function () {
       requiredPairs: fakeRequiredPairs,
     };
 
-    const graders = redifineConstraints(opts);
+    const { graders } = redifineConstraints(opts);
 
     // based on our fake data, the expected output is listed below
     const expectedGraders = [
@@ -322,7 +323,7 @@ describe('helpers > redefineConstraints', function () {
       },
     ];
 
-    const graders = redifineConstraints(opts);
+    const { graders } = redifineConstraints(opts);
 
     // spot checking each post processed fields
     graders.forEach((grader, i) => {

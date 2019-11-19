@@ -66,7 +66,7 @@ describe('classes > Graph', function () {
     console.log('pairings are ', pairings);
   });
 
-  it.only('return correct pairings when violation is unavoidable', async function () {
+  it('return correct pairings when violation is unavoidable', async function () {
     // create fake data
     const fakeSubmissions = [
       new Submission([1], true), // id: 1
@@ -92,6 +92,5 @@ describe('classes > Graph', function () {
 
     const graph = new Graph(fakeSubmissions, fakeGraders);
     const pairings = graph.solve();
-    console.log('pairings are ', pairings);
   });
 });

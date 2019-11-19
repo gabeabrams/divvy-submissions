@@ -45,9 +45,9 @@ class Grader {
   }
 
   /**
-   * Set numToGrade
-   * @param {number} newAllowedSubmissions - the list of submissions this grader
-   *   has to grade
+   * Set allowedSubmissions
+   * @param {Submission[]} newAllowedSubmissions - the list of submissions this
+   *   grader has to grade
    */
   setAllowedSubmissions(newAllowedSubmissions) {
     this.allowedSubmissions = newAllowedSubmissions;
