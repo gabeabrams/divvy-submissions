@@ -120,7 +120,7 @@ describe('helpers > redefineConstraints', function () {
     });
   });
 
-  it('returns correct graders w/ impossible required pair', async function () {
+  it.only('returns correct graders w/ impossible required pair', async function () {
     // create fake data
     const fakeSubmissions = [
       new Submission([1, 2], true),
@@ -216,21 +216,25 @@ describe('helpers > redefineConstraints', function () {
     // spot checking each post processed fields
     graders.forEach((grader, i) => {
       // verify allowed submissions is correct
-      assert.equal(
-        graders[i].allowedSubmissions.studentIds,
-        expectedGraders[i].allowedSubmissions.studentIds,
-        'did not return correct allowed submission studentIDs'
-      );
-      // verify isSubmitted is correct
-      assert.equal(
-        graders[i].allowedSubmissions.isSubmitted,
-        expectedGraders[i].allowedSubmissions.isSubmitted,
-        'did not return correct isSubmitted'
-      );
+      const allowedSubmission = grader.getAllowedSubmissions();
+      allowedSubmission.forEach((sub, j) => {
+        // check that allowed submissions returns correct value
+        assert.equal(
+          JSON.stringify(sub.getStudentIds()),
+          JSON.stringify(expectedGraders[i].allowedSubmissions[j].studentIds),
+          'did not return correct allowed submission studentIDs'
+        );
+        // check that isSubmitted returns correct value
+        assert.equal(
+          sub.getIsSubmitted(),
+          expectedGraders[i].allowedSubmissions[j].isSubmitted,
+          'did not return correct isSubmitted'
+        );
+      });
     });
   });
 
-  it('returns right list if student banned by all graders', async function () {
+  it.only('returns right list if student banned by all graders', async function () {
     // create fake data
     const fakeSubmissions = [
       new Submission([1, 2], true),
@@ -290,7 +294,7 @@ describe('helpers > redefineConstraints', function () {
           {
             id: 3,
             studentIds: [4, 5, 6],
-            isSubmitted: true,
+            isSubmitted: false,
           },
         ],
         proportionalWorkload: 1,
@@ -307,7 +311,7 @@ describe('helpers > redefineConstraints', function () {
           {
             id: 3,
             studentIds: [4, 5, 6],
-            isSubmitted: true,
+            isSubmitted: false,
           },
         ],
         proportionalWorkload: 1,
@@ -324,7 +328,7 @@ describe('helpers > redefineConstraints', function () {
           {
             id: 3,
             studentIds: [4, 5, 6],
-            isSubmitted: true,
+            isSubmitted: false,
           },
         ],
         proportionalWorkload: 1,
@@ -337,17 +341,21 @@ describe('helpers > redefineConstraints', function () {
     // spot checking each post processed fields
     graders.forEach((grader, i) => {
       // verify allowed submissions is correct
-      assert.equal(
-        graders[i].allowedSubmissions.studentIds,
-        expectedGraders[i].allowedSubmissions.studentIds,
-        'did not return correct allowed submission studentIDs'
-      );
-      // verify isSubmitted is correct
-      assert.equal(
-        graders[i].allowedSubmissions.isSubmitted,
-        expectedGraders[i].allowedSubmissions.isSubmitted,
-        'did not return correct isSubmitted'
-      );
+      const allowedSubmission = grader.getAllowedSubmissions();
+      allowedSubmission.forEach((sub, j) => {
+        // check that allowed submissions returns correct value
+        assert.equal(
+          JSON.stringify(sub.getStudentIds()),
+          JSON.stringify(expectedGraders[i].allowedSubmissions[j].studentIds),
+          'did not return correct allowed submission studentIDs'
+        );
+        // check that isSubmitted returns correct value
+        assert.equal(
+          sub.getIsSubmitted(),
+          expectedGraders[i].allowedSubmissions[j].isSubmitted,
+          'did not return correct isSubmitted'
+        );
+      });
     });
   });
 });
