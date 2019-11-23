@@ -42,8 +42,17 @@ const solve = require('./ford');
  *   }
  */
 module.exports = (opts) => {
-  // 1. Create submissions
+  // deconstruct opts
+  const {
+    students,
+    graders,
+    bannedPairs,
+    requiredPairs,
+    groups,
+  } = opts;
 
+  // 1. Create submissions
+  const submissions = createSubmissions({ students, groups });
   // 2. Redefine constraints
 
   // 3. Calculate workloads

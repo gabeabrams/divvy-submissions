@@ -12,7 +12,6 @@ const Submission = require('../classes/Submission');
 module.exports = (opts) => {
   // Deconstruct opts
   const { students, groups } = opts;
-
   // If this is an individual assignment
   if (!groups || groups.length === 0) {
     return students.map((student) => {
