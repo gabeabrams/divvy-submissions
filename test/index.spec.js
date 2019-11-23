@@ -2,7 +2,7 @@ const assert = require('assert');
 const main = require('../index');
 
 describe('index', function () {
-  it.only('returns correct pairing and violations object', async function () {
+  it('returns correct pairing and violations object', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {

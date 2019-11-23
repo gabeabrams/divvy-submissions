@@ -35,6 +35,15 @@ module.exports = (opts) => {
     violationMap[submissionId][graderId] = violation;
   };
 
+  // submissionsMap for looking up a submission from a student
+  const submissionMap = {}; // { studentId, submissionId }
+  submissions.forEach((submission) => {
+    const submissionId = submission.getSubmissionId();
+    submission.getStudentIds().forEach((studentId) => {
+      submissionMap[studentId] = submissionId;
+    });
+  });
+
   // pre processing constraints
   // check if there exist impossible required grader constraints
   const studentToRequiredGraderMapping = {};
@@ -57,9 +66,15 @@ module.exports = (opts) => {
     const requiredGradersIds = studentToRequiredGraderMapping[studentId];
     if (requiredGradersIds.length > 1) {
       requiredPairs = requiredPairs.filter((pair) => {
-        // if two graders are required to grade the same studet,
-        // we remove them both from required grading, but do we add a violation
-        // for them?
+        // add a violation for multiple graders required to grade a student
+        const violation = {
+          type: 'required',
+          listOfStudentsInvolved: [studentId],
+          listOfGradersInvolved: requiredGradersIds,
+        };
+        requiredGradersIds.forEach((requiredGraderId) => {
+          addViolation(submissionMap[studentId], requiredGraderId, violation);
+        });
         return pair.student !== studentId;
       });
     }
@@ -92,7 +107,7 @@ module.exports = (opts) => {
           const violation = {
             type: 'banned',
             listOfStudentsInvolved: sub.getStudentIds(),
-            listOfGradersInvolved: graderId,
+            listOfGradersInvolved: [graderId],
           };
           addViolation(sub.getSubmissionId(), grader.getId(), violation);
         }
@@ -128,7 +143,7 @@ module.exports = (opts) => {
             const violation = {
               type: 'required',
               listOfStudentsInvolved: sub.getStudentIds(),
-              listOfGradersInvolved: graderId,
+              listOfGradersInvolved: [graderId],
             };
             addViolation(sub.getSubmissionId(), id, violation);
           }

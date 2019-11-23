@@ -103,31 +103,31 @@ describe('helpers > redefineConstraints', function () {
         1: {
           type: 'required',
           listOfStudentsInvolved: [1, 2],
-          listOfGradersInvolved: 2,
+          listOfGradersInvolved: [2],
         },
         3: {
           type: 'required',
           listOfStudentsInvolved: [1, 2],
-          listOfGradersInvolved: 2,
+          listOfGradersInvolved: [2],
         },
       },
       2: {
         2: {
           type: 'required',
           listOfStudentsInvolved: [3],
-          listOfGradersInvolved: 1,
+          listOfGradersInvolved: [1],
         },
         3: {
           type: 'required',
           listOfStudentsInvolved: [3],
-          listOfGradersInvolved: 1,
+          listOfGradersInvolved: [1],
         },
       },
       3: {
         2: {
           type: 'banned',
           listOfStudentsInvolved: [4, 5, 6],
-          listOfGradersInvolved: 2,
+          listOfGradersInvolved: [2],
         },
       },
     };
@@ -158,7 +158,8 @@ describe('helpers > redefineConstraints', function () {
         Object.keys(
           violationMap[violationSub][violationGrader]
         ).forEach((type) => {
-          // violationSub (submission ids) doesn't necessarily start at 1 
+          console.log('each is ', expectedViolations[i + 1][violationGrader][type], violationMap[violationSub][violationGrader][type]);
+          // violationSub (submission ids) doesn't necessarily start at 1
           // if other tests that ran before this one have created submissions
           assert.equal(
             JSON.stringify(
@@ -270,19 +271,29 @@ describe('helpers > redefineConstraints', function () {
         1: {
           type: 'banned',
           listOfStudentsInvolved: [1, 2],
-          listOfGradersInvolved: 1,
+          listOfGradersInvolved: [1],
+        },
+        2: {
+          type: 'required',
+          listOfStudentsInvolved: [1],
+          listOfGradersInvolved: [2, 3],
+        },
+        3: {
+          type: 'required',
+          listOfStudentsInvolved: [1],
+          listOfGradersInvolved: [2, 3],
         },
       },
       2: {
         2: {
           type: 'required',
           listOfStudentsInvolved: [3],
-          listOfGradersInvolved: 1,
+          listOfGradersInvolved: [1],
         },
         3: {
           type: 'required',
           listOfStudentsInvolved: [3],
-          listOfGradersInvolved: 1,
+          listOfGradersInvolved: [1],
         },
       },
     };
@@ -432,17 +443,17 @@ describe('helpers > redefineConstraints', function () {
         1: {
           type: 'banned',
           listOfStudentsInvolved: [3],
-          listOfGradersInvolved: 1,
+          listOfGradersInvolved: [1],
         },
         2: {
           type: 'banned',
           listOfStudentsInvolved: [3],
-          listOfGradersInvolved: 2,
+          listOfGradersInvolved: [2],
         },
         3: {
           type: 'banned',
           listOfStudentsInvolved: [3],
-          listOfGradersInvolved: 3,
+          listOfGradersInvolved: [3],
         },
       },
     };

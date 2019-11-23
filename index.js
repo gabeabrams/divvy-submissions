@@ -73,8 +73,32 @@ module.exports = (opts) => {
 
   // 4. Solve
   const { pairings, violations } = solve(submissions, graders);
+  // ^violations is an array of { submissionId, graderId } pairs
+
   console.log('pairings is ', pairings);
   console.log('violations is ', violations);
 
   // 5. Post-process: reformat pairings and violations to create the results obj
+  const studentToGraderMap = pairings;
+
+  const workloadMap = {}; // { graderId => numToGrade }
+  Object.keys(studentToGraderMap).forEach((submissionId) => {
+    const graderId = studentToGraderMap[submissionId];
+    if (workloadMap[graderId] === undefined) {
+      workloadMap[graderId] = 1;
+    } else {
+      workloadMap[graderId] += 1;
+    }
+  });
+  console.log('workloadMap is ', workloadMap);
+  const constraintViolations = [];
+  violations.forEach((violationPair) => {
+    // extract the violation object from violationMap
+    const violationObject = (
+      violationMap[violationPair.submissionId][violationPair.graderId]
+    );
+    constraintViolations.push(violationObject);
+  });
+
+  return { studentToGraderMap, workloadMap, constraintViolations };
 };
