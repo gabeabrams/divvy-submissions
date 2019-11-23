@@ -36,7 +36,7 @@ describe('ford > classes > Edge', function () {
 
     // Test endNode getter
     assert.equal(
-      edge.getendNode(),
+      edge.getEndNode(),
       endNode,
       'end node was not initialized correctly'
     );

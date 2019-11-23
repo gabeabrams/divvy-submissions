@@ -11,14 +11,6 @@ describe('classes > Node', function () {
 
     // Create new node instanace
     const node = new Node(type, metadata);
-
-    // Test getters
-    assert.equal(
-      node.getNodeId(),
-      1,
-      'did not generate correct id for node'
-    );
-
     assert.equal(
       node.getNodeType(),
       type,

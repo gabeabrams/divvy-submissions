@@ -57,6 +57,9 @@ module.exports = (opts) => {
     const requiredGradersIds = studentToRequiredGraderMapping[studentId];
     if (requiredGradersIds.length > 1) {
       requiredPairs = requiredPairs.filter((pair) => {
+        // if two graders are required to grade the same studet,
+        // we remove them both from required grading, but do we add a violation
+        // for them?
         return pair.student !== studentId;
       });
     }
