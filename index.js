@@ -45,15 +45,26 @@ module.exports = (opts) => {
   // deconstruct opts
   const {
     students,
-    graders,
     bannedPairs,
     requiredPairs,
     groups,
   } = opts;
 
+  let { graders } = opts;
+
   // 1. Create submissions
   const submissions = createSubmissions({ students, groups });
+
   // 2. Redefine constraints
+  const returnedConstraint = redefineConstraints({
+    submissions,
+    graders,
+    bannedPairs,
+    requiredPairs,
+  });
+
+  const { violationMap } = returnedConstraint;
+  ({ graders } = returnedConstraint);
 
   // 3. Calculate workloads
 
