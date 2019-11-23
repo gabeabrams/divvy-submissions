@@ -71,7 +71,7 @@ class Graph {
             isAllowed
               ? 1
               : this.NOT_ALLOWED_WEIGHT
-              // ^ Add high-weight edge because this pairing is not allowed
+          // ^ Add high-weight edge because this pairing is not allowed
           ),
           capacity: 1,
           flow: 0,
