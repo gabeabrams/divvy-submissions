@@ -66,10 +66,14 @@ module.exports = (opts) => {
   const { violationMap } = returnedConstraint;
   ({ graders } = returnedConstraint);
   console.log('graders is ', graders);
+  console.log('violations map is ', violationMap);
 
   // 3. Calculate workloads
   graders = calculateWorkloads(graders, submissions.length);
   console.log('graders after is ', graders);
+
+  // remember to shuffle the submissions and graders before passing them
+  // into solve, but for the purpose of testing, they are not shuffled now
 
   // 4. Solve
   const { pairings, violations } = solve(submissions, graders);

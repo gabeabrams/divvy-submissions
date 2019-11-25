@@ -238,7 +238,7 @@ class Graph {
 
     // Find pairings and violations
     const pairings = {}; // submissionId => graderId
-    const violations = []; // edge => { submissionId, graderId }
+    const violations = []; // an array of pairs { submissionId, graderId }
     this.graderNodes.forEach((graderNode) => {
       // Get pairings
       const graderId = (
