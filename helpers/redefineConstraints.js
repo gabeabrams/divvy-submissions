@@ -12,7 +12,8 @@ const Grader = require('../classes/Grader');
  * @param {object[]} [requiredPairs] - a list of pairs in the form
  *   { grader: <grader id>, student: <student id> } where in each pair, the
  *   specified grader must grade the specified student
- * @return {object} results in form { graders, violationMap } where
+ * @return {object} results in form
+ *   { graders, violationMap, violationsThatAlreadyOccurred } where
  *   graders is a list of grader instances with allowedSubs defined but
  *   numToGrade not defined yet and violationMap is a map
  *   { submissionId => graderId => violationObj }
@@ -27,6 +28,10 @@ module.exports = (opts) => {
 
   let { requiredPairs } = opts;
 
+  // A list of violations that already occurred even before running the algo
+  const violationsThatAlreadyOccurred = [];
+
+  // Lookup map for violations if submissionId is paired with graderId
   const violationMap = {}; // submissionId => graderId => violationObj
   const addViolation = (submissionId, graderId, violation) => {
     if (!violationMap[submissionId]) {
@@ -66,16 +71,15 @@ module.exports = (opts) => {
     const requiredGradersIds = studentToRequiredGraderMapping[studentId];
     if (requiredGradersIds.length > 1) {
       requiredPairs = requiredPairs.filter((pair) => {
-        // add a violation for multiple graders required to grade a student
-        const violation = {
-          type: 'required',
-          listOfStudentsInvolved: [studentId],
-          listOfGradersInvolved: requiredGradersIds,
-        };
-        requiredGradersIds.forEach((requiredGraderId) => {
-          addViolation(submissionMap[studentId], requiredGraderId, violation);
-        });
         return pair.student !== studentId;
+      });
+
+      // add a violation for multiple graders required to grade a student
+      violationsThatAlreadyOccurred.push({
+        englishDescription: 'More than one grader is required to grade this student.',
+        type: 'required',
+        listOfStudentsInvolved: [studentId],
+        listOfGradersInvolved: requiredGradersIds,
       });
     }
   });
@@ -105,6 +109,7 @@ module.exports = (opts) => {
         if (!pairAllowed) {
           // Add a violation if this pair is assigned
           const violation = {
+            englishDescription: 'This grader is banned from grading this submission.',
             type: 'banned',
             listOfStudentsInvolved: sub.getStudentIds(),
             listOfGradersInvolved: [graderId],
@@ -141,6 +146,7 @@ module.exports = (opts) => {
           if (!pairAllowed) {
             // Add a violation if this pair is assigned
             const violation = {
+              englishDescription: 'A different grader is required to grade this submission.',
               type: 'required',
               listOfStudentsInvolved: sub.getStudentIds(),
               listOfGradersInvolved: [graderId],
@@ -157,7 +163,8 @@ module.exports = (opts) => {
   });
 
   return {
-    graders: Object.values(graderIdToGraderMapping),
     violationMap,
+    violationsThatAlreadyOccurred,
+    graders: Object.values(graderIdToGraderMapping),
   };
 };

@@ -7,6 +7,9 @@ const calculateWorkloads = require('./helpers/calculateWorkloads');
 // 4. Solve
 const solve = require('./ford');
 
+// import helpers
+const shuffle = require('./helpers/shuffle');
+
 /**
  * Divvy up submissions to graders
  * @param {object[]} students - the full list of student entries in the form:
@@ -27,6 +30,8 @@ const solve = require('./ford');
  * @param {number[][]} [groups] - if the assignment is a group assignment, this
  *   is a list of id arrays where each id array represents the ids of students
  *   in a specific group
+ * @param {boolean} [isDeterministic] - if true, pairings won't be randomized,
+ *   so you'll get the same results if you repeatedly run this algorithm
  * @return {object} results of the divvying in the form:
  *   { studentToGraderMap, workloadMap, constraintViolations }
  *   where studentToGraderMap is a map { studentId => graderId } for looking up
@@ -36,6 +41,7 @@ const solve = require('./ford');
  *   violations to the bannedPairs and requiredPairs constraints that we had to
  *   break in order to assign all submissions to graders in the form:
  *   {
+ *     englishDescription: <string description for user>,
  *     type: <'banned' or 'required'>,
  *     listOfStudentsInvolved: <array of student ids>,
  *     listOfGradersInvolved: <array of grader ids>,
@@ -48,12 +54,14 @@ module.exports = (opts) => {
     bannedPairs,
     requiredPairs,
     groups,
+    isDeterministic,
   } = opts;
 
   let { graders } = opts;
 
   // 1. Create submissions
-  const submissions = createSubmissions({ students, groups });
+  let submissions = createSubmissions({ students, groups });
+  console.log('submissions is ', submissions);
 
   // 2. Redefine constraints
   const returnedConstraint = redefineConstraints({
@@ -63,7 +71,7 @@ module.exports = (opts) => {
     requiredPairs,
   });
 
-  const { violationMap } = returnedConstraint;
+  const { violationMap, violationsThatAlreadyOccurred } = returnedConstraint;
   ({ graders } = returnedConstraint);
   console.log('graders is ', graders);
   console.log('violations map is ', violationMap);
@@ -74,20 +82,21 @@ module.exports = (opts) => {
 
   // remember to shuffle the submissions and graders before passing them
   // into solve, but for the purpose of testing, they are not shuffled now
+  if (!isDeterministic) {
+    submissions = shuffle(submissions);
+    graders = shuffle(graders);
+  }
 
   // 4. Solve
   const { pairings, violations } = solve(submissions, graders);
   // ^violations is an array of { submissionId, graderId } pairs
 
   console.log('pairings is ', pairings);
-  console.log('violations is ', violations);
 
   // 5. Post-process: reformat pairings and violations to create the results obj
-  const studentToGraderMap = pairings;
-
   const workloadMap = {}; // { graderId => numToGrade }
-  Object.keys(studentToGraderMap).forEach((submissionId) => {
-    const graderId = studentToGraderMap[submissionId];
+  Object.keys(pairings).forEach((submissionId) => {
+    const graderId = pairings[submissionId];
     if (workloadMap[graderId] === undefined) {
       workloadMap[graderId] = 1;
     } else {
@@ -103,6 +112,29 @@ module.exports = (opts) => {
     );
     constraintViolations.push(violationObject);
   });
+
+  // Add in violations that already occurred
+  violationsThatAlreadyOccurred.forEach((violation) => {
+    constraintViolations.push(violation);
+  });
+
+  console.log('violations is ', constraintViolations);
+  const studentToGraderMap = {};
+  const submissionIdToStudentIds = {};
+  submissions.forEach((submission) => {
+    submissionIdToStudentIds[submission.getSubmissionId()] = (
+      submission.getStudentIds()
+    );
+  });
+
+  Object.keys(pairings).forEach((submissionId) => {
+    const studentIds = submissionIdToStudentIds[submissionId];
+    studentIds.forEach((studentId) => {
+      studentToGraderMap[studentId] = pairings[submissionId];
+    });
+  });
+
+  console.log('student to grader map is ', studentToGraderMap);
 
   return { studentToGraderMap, workloadMap, constraintViolations };
 };
