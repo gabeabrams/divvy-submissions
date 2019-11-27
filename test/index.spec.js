@@ -331,7 +331,21 @@ describe('index', function () {
 
     // running this test multiple times can result in different pairings,
     // showing randomizaiton works
-    const result = main(opts);
+    const { studentToGraderMap, constraintViolations } = main(opts);
+
+    // check that all student is assigned a grader
+    assert.equal(
+      Object.keys(studentToGraderMap).length,
+      students.length,
+      'not all students have been assigned'
+    );
+
+    // check if there are no constraint violations
+    assert.equal(
+      constraintViolations.length,
+      0,
+      'did not return correct violations'
+    );
   });
 
   it('returns randomized pairing w/ varying workloads', async function () {
@@ -380,7 +394,21 @@ describe('index', function () {
 
     // running this test multiple times can result in different pairings,
     // showing randomizaiton works
-    const result = main(opts);
+    const { studentToGraderMap, constraintViolations } = main(opts);
+
+    // check that all student is assigned a grader
+    assert.equal(
+      Object.keys(studentToGraderMap).length,
+      students.length,
+      'not all students have been assigned'
+    );
+
+    // check if there are no constraint violations
+    assert.equal(
+      constraintViolations.length,
+      0,
+      'did not return correct violations'
+    );
   });
 
   it('returns correct pairing in group assignment', async function () {
@@ -890,6 +918,68 @@ describe('index', function () {
       graders.length - Object.keys(workloadMap).length,
       1,
       'one and only one grader is not grading any student condition is not met'
+    );
+
+    // check if there are no constraint violations
+    assert.equal(
+      constraintViolations.length,
+      0,
+      'did not return correct violations'
+    );
+  });
+
+  it('returns result when assigned students > workload', async function () {
+    // the full list of student entries in the form: { id, isSubmitted }
+    const students = [
+      {
+        id: 1,
+        isSubmitted: true,
+      },
+      {
+        id: 2,
+        isSubmitted: true,
+      },
+      {
+        id: 3,
+        isSubmitted: true,
+      },
+    ];
+
+    // the full list of grader entries in the form: { id, proportionalWorkload }
+    const graders = [
+      {
+        id: 1,
+        proportionalWorkload: 1,
+      }, {
+        id: 2,
+        proportionalWorkload: 1,
+      },
+    ];
+
+    // a list of pairs in the form:
+    // { grader: <grader id>, student: <student id> }
+    const bannedPairs = [];
+
+    // a list of pairs in the form:
+    // { grader: <grader id>, student: <student id> }
+    const requiredPairs = [];
+
+    const opts = {
+      students,
+      graders,
+      bannedPairs,
+      requiredPairs,
+      isDeterministic: true,
+    };
+
+    // running the algorithm, a random grader will get assigned 2 students
+    const { studentToGraderMap, constraintViolations } = main(opts);
+
+    // check that all student is assigned a grader
+    assert.equal(
+      Object.keys(studentToGraderMap).length,
+      students.length,
+      'not all students have been assigned'
     );
 
     // check if there are no constraint violations
