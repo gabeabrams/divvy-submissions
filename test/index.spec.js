@@ -2,7 +2,7 @@ const assert = require('assert');
 const main = require('../index');
 
 describe('index', function () {
-  it('returns correct pairing and violations object', async function () {
+  it.only('returns correct pairing and violations object', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
@@ -79,7 +79,49 @@ describe('index', function () {
       isDeterministic: true,
     };
 
-    const result = main(opts);
+    const expectedWorkloadMap = {
+      1: 2,
+      2: 2,
+    };
+
+    const expectedStudentToGrader = {
+      1: 2,
+      2: 2,
+      3: 1,
+      4: 2,
+      5: 2,
+      6: 2,
+      7: 1,
+      8: 1,
+    };
+
+    const {
+      studentToGraderMap,
+      workloadMap,
+      constraintViolations,
+    } = main(opts);
+
+    Object.keys(studentToGraderMap).forEach((studentId) => {
+      assert.equal(
+        studentToGraderMap[studentId],
+        expectedStudentToGrader[studentId],
+        'did not return correct pairing'
+      );
+    });
+
+    Object.keys(workloadMap).forEach((graderId) => {
+      assert.equal(
+        workloadMap[graderId],
+        expectedWorkloadMap[graderId],
+        'did not return correct workload'
+      );
+    });
+
+    assert.equal(
+      constraintViolations.length,
+      0,
+      'did not return correct violations'
+    );
   });
 
   it('returns correct pairing and violations object', async function () {
@@ -309,7 +351,7 @@ describe('index', function () {
     const result = main(opts);
   });
 
-  it.only('returns correct pairing in group assignment', async function () {
+  it('returns correct pairing in group assignment', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
