@@ -2,7 +2,7 @@ const assert = require('assert');
 const main = require('../index');
 
 describe('index', function () {
-  it.only('returns correct pairing and violations object', async function () {
+  it('returns correct pairing and violations object', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
@@ -124,7 +124,7 @@ describe('index', function () {
     );
   });
 
-  it('returns correct pairing and violations object', async function () {
+  it.only('returns correct pairing and violations object', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
@@ -190,7 +190,24 @@ describe('index', function () {
       isDeterministic: true,
     };
 
-    const result = main(opts);
+    const expectedViolations = [{
+      englishDescription: 'More than one grader is required to grade this student.',
+      type: 'required',
+      listOfStudentsInvolved: [1],
+      listOfGradersInvolved: [2, 3],
+    }];
+
+    const { constraintViolations } = main(opts);
+
+    constraintViolations.forEach((violation, i) => {
+      Object.keys(violation).forEach((violationField) => {
+        assert.equal(
+          JSON.stringify(violation[violationField]),
+          JSON.stringify(expectedViolations[i][violationField]),
+          'did not return correct violations'
+        );
+      });
+    });
   });
 
   it('returns correct pairing and violations object', async function () {

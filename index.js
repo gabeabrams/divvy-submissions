@@ -82,6 +82,7 @@ module.exports = (opts) => {
 
   // randomize the array
   if (!isDeterministic) {
+    console.log('in here!!!!!!!!');
     submissions = shuffle(submissions);
     graders = shuffle(graders);
   }
