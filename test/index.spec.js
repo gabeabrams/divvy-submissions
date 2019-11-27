@@ -592,7 +592,7 @@ describe('index', function () {
     );
   });
 
-  it.only('returns correct pairing when required > workload', async function () {
+  it('returns correct pairing when required > workload', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
@@ -668,6 +668,123 @@ describe('index', function () {
     const expectedViolations = [{
       englishDescription: 'A different grader is required to grade this submission.',
       type: 'required',
+      listOfStudentsInvolved: [3],
+      listOfGradersInvolved: [1],
+    }];
+
+    // run the algorithm
+    const {
+      studentToGraderMap,
+      workloadMap,
+      constraintViolations,
+    } = main(opts);
+
+    // check if studentToGraderMap matches expected result
+    Object.keys(studentToGraderMap).forEach((studentId) => {
+      assert.equal(
+        studentToGraderMap[studentId],
+        expectedStudentToGrader[studentId],
+        'did not return correct pairing in a group assignment'
+      );
+    });
+
+    // check if workloadMap matches expected result
+    Object.keys(workloadMap).forEach((graderId) => {
+      assert.equal(
+        workloadMap[graderId],
+        expectedWorkloadMap[graderId],
+        'did not return correct workload'
+      );
+    });
+
+    // check if constraintViolations matches expected result
+    constraintViolations.forEach((violation, i) => {
+      Object.keys(violation).forEach((violationField) => {
+        assert.equal(
+          JSON.stringify(violation[violationField]),
+          JSON.stringify(expectedViolations[i][violationField]),
+          'did not return correct violations'
+        );
+      });
+    });
+  });
+
+  it('returns correct pairing when grader has many friends', async function () {
+    // the full list of student entries in the form: { id, isSubmitted }
+    const students = [
+      {
+        id: 1,
+        isSubmitted: true,
+      },
+      {
+        id: 2,
+        isSubmitted: true,
+      },
+      {
+        id: 3,
+        isSubmitted: true,
+      },
+      {
+        id: 4,
+        isSubmitted: true,
+      },
+    ];
+
+    // the full list of grader entries in the form: { id, proportionalWorkload }
+    const graders = [
+      {
+        id: 1,
+        proportionalWorkload: 1,
+      }, {
+        id: 2,
+        proportionalWorkload: 1,
+      },
+    ];
+
+    // a list of pairs in the form:
+    // { grader: <grader id>, student: <student id> }
+    const bannedPairs = [
+      {
+        grader: 1,
+        student: 1,
+      },
+      {
+        grader: 1,
+        student: 2,
+      },
+      {
+        grader: 1,
+        student: 3,
+      },
+    ];
+
+    // a list of pairs in the form:
+    // { grader: <grader id>, student: <student id> }
+    const requiredPairs = [];
+
+    const opts = {
+      students,
+      graders,
+      bannedPairs,
+      requiredPairs,
+      isDeterministic: true,
+    };
+
+    const expectedStudentToGrader = {
+      1: 2,
+      2: 2,
+      3: 1,
+      4: 1,
+    };
+
+    const expectedWorkloadMap = {
+      1: 2,
+      2: 2,
+    };
+
+    const expectedViolations = [{
+      englishDescription: 'This grader is banned from grading this submission.',
+      type: 'banned',
       listOfStudentsInvolved: [3],
       listOfGradersInvolved: [1],
     }];
