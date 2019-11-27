@@ -260,7 +260,7 @@ describe('index', function () {
     const result = main(opts);
   });
 
-  it.only('returns randomized pairing w/ varying workloads', async function () {
+  it('returns randomized pairing w/ varying workloads', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
@@ -307,5 +307,84 @@ describe('index', function () {
     // running this test multiple times can result in different pairings,
     // showing randomizaiton works
     const result = main(opts);
+  });
+
+  it.only('returns correct pairing in group assignment', async function () {
+    // the full list of student entries in the form: { id, isSubmitted }
+    const students = [
+      {
+        id: 1,
+        isSubmitted: true,
+      },
+      {
+        id: 2,
+        isSubmitted: true,
+      },
+      {
+        id: 3,
+        isSubmitted: true,
+      },
+      {
+        id: 4,
+        isSubmitted: true,
+      },
+      {
+        id: 5,
+        isSubmitted: true,
+      },
+    ];
+
+    // the full list of grader entries in the form: { id, proportionalWorkload }
+    const graders = [
+      {
+        id: 1,
+        proportionalWorkload: 1,
+      }, {
+        id: 2,
+        proportionalWorkload: 1,
+      },
+    ];
+
+    // a list of id arrays where each id array represents
+    // the ids of students in a specific group
+    const groups = [[1, 2], [3, 4, 5]];
+
+    // a list of pairs in the form:
+    // { grader: <grader id>, student: <student id> }
+    const bannedPairs = [];
+
+    // a list of pairs in the form:
+    // { grader: <grader id>, student: <student id> }
+    const requiredPairs = [];
+
+    const opts = {
+      students,
+      graders,
+      groups,
+      bannedPairs,
+      requiredPairs,
+      isDeterministic: true,
+    };
+
+    // ensures every student is assigned and students in each group is assigned
+    // the same grader
+    const expectedStudentToGrader = {
+      1: 1,
+      2: 1,
+      3: 2,
+      4: 2,
+      5: 2,
+    };
+
+    // running this test multiple times can result in different pairings,
+    // showing randomizaiton works
+    const { studentToGraderMap } = main(opts);
+    Object.keys(studentToGraderMap).forEach((studentId) => {
+      assert.equal(
+        studentToGraderMap[studentId],
+        expectedStudentToGrader[studentId],
+        'did not return correct pairing in a group assignment'
+      );
+    });
   });
 });
