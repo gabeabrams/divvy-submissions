@@ -101,11 +101,13 @@ describe('helpers > redefineConstraints', function () {
     const expectedViolations = {
       1: {
         1: {
+          englishDescription: 'A different grader is required to grade this submission.',
           type: 'required',
           listOfStudentsInvolved: [1, 2],
           listOfGradersInvolved: [2],
         },
         3: {
+          englishDescription: 'A different grader is required to grade this submission.',
           type: 'required',
           listOfStudentsInvolved: [1, 2],
           listOfGradersInvolved: [2],
@@ -113,11 +115,13 @@ describe('helpers > redefineConstraints', function () {
       },
       2: {
         2: {
+          englishDescription: 'A different grader is required to grade this submission.',
           type: 'required',
           listOfStudentsInvolved: [3],
           listOfGradersInvolved: [1],
         },
         3: {
+          englishDescription: 'A different grader is required to grade this submission.',
           type: 'required',
           listOfStudentsInvolved: [3],
           listOfGradersInvolved: [1],
@@ -125,6 +129,7 @@ describe('helpers > redefineConstraints', function () {
       },
       3: {
         2: {
+          englishDescription: 'This grader is banned from grading this submission.',
           type: 'banned',
           listOfStudentsInvolved: [4, 5, 6],
           listOfGradersInvolved: [2],
@@ -224,7 +229,11 @@ describe('helpers > redefineConstraints', function () {
       requiredPairs: fakeRequiredPairs,
     };
 
-    const { graders, violationMap } = redifineConstraints(opts);
+    const {
+      graders,
+      violationMap,
+      violationsThatAlreadyOccurred,
+    } = redifineConstraints(opts);
 
     // based on our fake data, the expected output is listed below
     const expectedGraders = [
@@ -266,31 +275,33 @@ describe('helpers > redefineConstraints', function () {
       },
     ];
 
+    const expectedOccuredViolations = [
+      {
+        englishDescription: 'More than one grader is required to grade this student.',
+        type: 'required',
+        listOfStudentsInvolved: [1],
+        listOfGradersInvolved: [2, 3],
+      },
+    ];
+
     const expectedViolations = {
       1: {
         1: {
+          englishDescription: 'This grader is banned from grading this submission.',
           type: 'banned',
           listOfStudentsInvolved: [1, 2],
           listOfGradersInvolved: [1],
         },
-        2: {
-          type: 'required',
-          listOfStudentsInvolved: [1],
-          listOfGradersInvolved: [2, 3],
-        },
-        3: {
-          type: 'required',
-          listOfStudentsInvolved: [1],
-          listOfGradersInvolved: [2, 3],
-        },
       },
       2: {
         2: {
+          englishDescription: 'A different grader is required to grade this submission.',
           type: 'required',
           listOfStudentsInvolved: [3],
           listOfGradersInvolved: [1],
         },
         3: {
+          englishDescription: 'A different grader is required to grade this submission.',
           type: 'required',
           listOfStudentsInvolved: [3],
           listOfGradersInvolved: [1],
@@ -332,6 +343,16 @@ describe('helpers > redefineConstraints', function () {
             'violations map does not match'
           );
         });
+      });
+    });
+
+    violationsThatAlreadyOccurred.forEach((violation, i) => {
+      Object.keys(violation).forEach((violationField) => {
+        assert.equal(
+          JSON.stringify(violation[violationField]),
+          JSON.stringify(expectedOccuredViolations[i][violationField]),
+          'did not return correct violations'
+        );
       });
     });
   });
@@ -441,16 +462,19 @@ describe('helpers > redefineConstraints', function () {
     const expectedViolations = {
       2: {
         1: {
+          englishDescription: 'This grader is banned from grading this submission.',
           type: 'banned',
           listOfStudentsInvolved: [3],
           listOfGradersInvolved: [1],
         },
         2: {
+          englishDescription: 'This grader is banned from grading this submission.',
           type: 'banned',
           listOfStudentsInvolved: [3],
           listOfGradersInvolved: [2],
         },
         3: {
+          englishDescription: 'This grader is banned from grading this submission.',
           type: 'banned',
           listOfStudentsInvolved: [3],
           listOfGradersInvolved: [3],

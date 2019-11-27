@@ -124,7 +124,7 @@ describe('index', function () {
     );
   });
 
-  it.only('returns correct pairing and violations object', async function () {
+  it('returns correct pairing and violations object', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
@@ -271,7 +271,21 @@ describe('index', function () {
       isDeterministic: true,
     };
 
-    const result = main(opts);
+    const { constraintViolations } = main(opts);
+
+    const expectedDescription = 'This grader is banned from grading this submission.';
+    const expectedType = 'banned';
+
+    assert.equal(
+      constraintViolations[0].englishDescription,
+      expectedDescription,
+      'did not return correct violation description'
+    );
+    assert.equal(
+      constraintViolations[0].type,
+      expectedType,
+      'did not return correct violations type'
+    );
   });
 
   it('returns correct pairing with randomization', async function () {

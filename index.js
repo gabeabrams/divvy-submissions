@@ -76,7 +76,7 @@ module.exports = (opts) => {
   console.log('graders is ', graders);
   console.log('violations map is ', violationMap);
 
-  // 3. Calculate workloads
+  // 3. Calculate workloads, graders array is shuffled
   graders = calculateWorkloads(graders, submissions.length);
   console.log('graders after is ', graders);
 
