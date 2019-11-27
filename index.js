@@ -80,8 +80,7 @@ module.exports = (opts) => {
   graders = calculateWorkloads(graders, submissions.length);
   console.log('graders after is ', graders);
 
-  // remember to shuffle the submissions and graders before passing them
-  // into solve, but for the purpose of testing, they are not shuffled now
+  // randomize the array
   if (!isDeterministic) {
     submissions = shuffle(submissions);
     graders = shuffle(graders);

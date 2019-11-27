@@ -2,7 +2,7 @@ const assert = require('assert');
 const main = require('../index');
 
 describe('index', function () {
-  it.only('returns correct pairing and violations object', async function () {
+  it('returns correct pairing and violations object', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
@@ -76,6 +76,7 @@ describe('index', function () {
       bannedPairs,
       requiredPairs,
       groups,
+      isDeterministic: true,
     };
 
     const result = main(opts);
@@ -144,6 +145,7 @@ describe('index', function () {
       bannedPairs,
       requiredPairs,
       groups,
+      isDeterministic: true,
     };
 
     const result = main(opts);
@@ -207,8 +209,53 @@ describe('index', function () {
       bannedPairs,
       requiredPairs,
       groups,
+      isDeterministic: true,
     };
 
+    const result = main(opts);
+  });
+
+  it.only('returns correct pairing with randomization', async function () {
+    // the full list of student entries in the form: { id, isSubmitted }
+    const students = [
+      {
+        id: 1,
+        isSubmitted: true,
+      },
+      {
+        id: 2,
+        isSubmitted: true,
+      },
+    ];
+
+    // the full list of grader entries in the form: { id, proportionalWorkload }
+    const graders = [
+      {
+        id: 1,
+        proportionalWorkload: 1,
+      }, {
+        id: 2,
+        proportionalWorkload: 1,
+      },
+    ];
+
+    // a list of pairs in the form:
+    // { grader: <grader id>, student: <student id> }
+    const bannedPairs = [];
+
+    // a list of pairs in the form:
+    // { grader: <grader id>, student: <student id> }
+    const requiredPairs = [];
+    const opts = {
+      students,
+      graders,
+      bannedPairs,
+      requiredPairs,
+      isDeterministic: false,
+    };
+
+    // running this test multiple times can result in different pairings,
+    // showing randomizaiton works
     const result = main(opts);
   });
 });
