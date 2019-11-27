@@ -798,6 +798,8 @@ describe('index', function () {
 
     // check if studentToGraderMap matches expected result
     Object.keys(studentToGraderMap).forEach((studentId) => {
+      console.log('the two values are ', studentToGraderMap[studentId], expectedStudentToGrader[studentId]);
+      console.log('student id is ', studentId);
       assert.equal(
         studentToGraderMap[studentId],
         expectedStudentToGrader[studentId],
@@ -824,5 +826,77 @@ describe('index', function () {
         );
       });
     });
+  });
+
+  it('returns correct pairing w/ more graders than student', async function () {
+    // the full list of student entries in the form: { id, isSubmitted }
+    const students = [
+      {
+        id: 1,
+        isSubmitted: true,
+      },
+      {
+        id: 2,
+        isSubmitted: true,
+      },
+      {
+        id: 3,
+        isSubmitted: true,
+      },
+    ];
+
+    // the full list of grader entries in the form: { id, proportionalWorkload }
+    const graders = [
+      {
+        id: 1,
+        proportionalWorkload: 1,
+      }, {
+        id: 2,
+        proportionalWorkload: 1,
+      },
+      {
+        id: 3,
+        proportionalWorkload: 1,
+      }, {
+        id: 4,
+        proportionalWorkload: 1,
+      },
+    ];
+
+    // a list of pairs in the form:
+    // { grader: <grader id>, student: <student id> }
+    const bannedPairs = [];
+
+    // a list of pairs in the form:
+    // { grader: <grader id>, student: <student id> }
+    const requiredPairs = [];
+
+    const opts = {
+      students,
+      graders,
+      bannedPairs,
+      requiredPairs,
+      isDeterministic: true,
+    };
+
+    // running the algorithm
+    const {
+      workloadMap,
+      constraintViolations,
+    } = main(opts);
+
+    // check that one and only one grader is not grading any students
+    assert.equal(
+      graders.length - Object.keys(workloadMap).length,
+      1,
+      'one and only one grader is not grading any student condition is not met'
+    );
+
+    // check if there are no constraint violations
+    assert.equal(
+      constraintViolations.length,
+      0,
+      'did not return correct violations'
+    );
   });
 });
