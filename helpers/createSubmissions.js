@@ -10,5 +10,31 @@ const Submission = require('../classes/Submission');
  * @return {Submission[]} the submission objects
  */
 module.exports = (opts) => {
-  // TODO: implement
+  // Deconstruct opts
+  const { students, groups } = opts;
+  // If this is an individual assignment, just create sub for each student
+  if (!groups || groups.length === 0) {
+    return students.map((student) => {
+      return new Submission([student.id], student.isSubmitted);
+    });
+  }
+
+  // This is a group assignment
+
+  // Pre-process students for quick lookup
+  const studentIsSubmitted = {}; // studentId => isSubmitted
+  students.forEach((student) => {
+    studentIsSubmitted[student.id] = student.isSubmitted;
+  });
+
+  // Create submission for each group
+  return groups.map((group) => {
+    // Check if anyone in the group has submitted
+    const isSubmittedGroup = group.some((studentId) => {
+      return studentIsSubmitted[studentId];
+    });
+
+    // Create a new submission instance
+    return new Submission(group, isSubmittedGroup);
+  });
 };
