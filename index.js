@@ -59,11 +59,10 @@ module.exports = (opts) => {
 
   let { graders } = opts;
 
-  // 1. Create submissions
+  /* -------------------- 1. Create Submissions ------------------- */
   let submissions = createSubmissions({ students, groups });
-  console.log('submissions is ', submissions);
 
-  // 2. Redefine constraints
+  /* ------------------- 2. Redefine Constraints ------------------ */
   const returnedConstraint = redefineConstraints({
     submissions,
     graders,
@@ -73,27 +72,23 @@ module.exports = (opts) => {
 
   const { violationMap, violationsThatAlreadyOccurred } = returnedConstraint;
   ({ graders } = returnedConstraint);
-  console.log('graders is ', graders);
-  console.log('violations map is ', violationMap);
 
-  // 3. Calculate workloads, graders array is shuffled
+  /* ------------ 3. Calculate workloads, shuffle graders ----------- */
   graders = calculateWorkloads(graders, submissions.length);
-  console.log('graders after is ', graders);
 
   // randomize the array
   if (!isDeterministic) {
-    console.log('in here!!!!!!!!');
     submissions = shuffle(submissions);
     graders = shuffle(graders);
   }
 
-  // 4. Solve
+  /* ------------------- 4. Solve ------------------ */
+
   const { pairings, violations } = solve(submissions, graders);
   // ^violations is an array of { submissionId, graderId } pairs
 
-  console.log('pairings is ', pairings);
-
-  // 5. Post-process: reformat pairings and violations to create the results obj
+  /* ---- 5. Post-process: reformat pairs & violations, create results---- */
+  // Create the worload map
   const workloadMap = {}; // { graderId => numToGrade }
   Object.keys(pairings).forEach((submissionId) => {
     const graderId = pairings[submissionId];
@@ -103,7 +98,8 @@ module.exports = (opts) => {
       workloadMap[graderId] += 1;
     }
   });
-  console.log('workloadMap is ', workloadMap);
+
+  // Turn violation pairs into violation objects
   const constraintViolations = [];
   violations.forEach((violationPair) => {
     // extract the violation object from violationMap
@@ -118,15 +114,16 @@ module.exports = (opts) => {
     constraintViolations.push(violation);
   });
 
-  console.log('violations is ', constraintViolations);
+  // Turn pairs from (submissionId => graderId) to (studentId => graderId)
   const studentToGraderMap = {};
+  // > Create a lookup map submissionId => studentIds in submission
   const submissionIdToStudentIds = {};
   submissions.forEach((submission) => {
     submissionIdToStudentIds[submission.getSubmissionId()] = (
       submission.getStudentIds()
     );
   });
-
+  // > Translate pairings
   Object.keys(pairings).forEach((submissionId) => {
     const studentIds = submissionIdToStudentIds[submissionId];
     studentIds.forEach((studentId) => {
@@ -134,7 +131,10 @@ module.exports = (opts) => {
     });
   });
 
-  console.log('student to grader map is ', studentToGraderMap);
-
-  return { studentToGraderMap, workloadMap, constraintViolations };
+  // Create and return the response object
+  return {
+    studentToGraderMap,
+    workloadMap,
+    constraintViolations,
+  };
 };

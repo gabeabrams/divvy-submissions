@@ -1,10 +1,9 @@
-const assert = require('assert');
 const Graph = require('../../../ford/classes/Graph');
 const Grader = require('../../../classes/Grader');
 const Submission = require('../../../classes/Submission');
 
 describe('classes > Graph', function () {
-  it('returns correct pairings', async function () {
+  it('runs without crashing', async function () {
     // create fake data
     const fakeSubmissions = [
       new Submission([1], true), // id: 1
@@ -41,11 +40,10 @@ describe('classes > Graph', function () {
     });
 
     const graph = new Graph(fakeSubmissions, fakeGraders);
-    const pairings = graph.solve();
-    console.log('pairings is ', pairings);
+    graph.solve();
   });
 
-  it('returns correct pairings II', async function () {
+  it('runs on second test set without crashing', async function () {
     // create fake data
     const fakeSubmissions = [
       new Submission([1], true), // id: 1
@@ -62,11 +60,10 @@ describe('classes > Graph', function () {
     });
 
     const graph = new Graph(fakeSubmissions, fakeGraders);
-    const pairings = graph.solve();
-    console.log('pairings are ', pairings);
+    graph.solve();
   });
 
-  it('return correct pairings when violation is unavoidable', async function () {
+  it('runs without crashing even when violation occurs', async function () {
     // create fake data
     const fakeSubmissions = [
       new Submission([1], true), // id: 1
@@ -91,6 +88,6 @@ describe('classes > Graph', function () {
     });
 
     const graph = new Graph(fakeSubmissions, fakeGraders);
-    const pairings = graph.solve();
+    graph.solve();
   });
 });

@@ -15,7 +15,7 @@ class Grader {
     this.id = graderId;
     this.allowedSubmissions = allowedSubmissions;
     this.proportionalWorkload = proportionalWorkload;
-    this.numToGrade = -1; // Initialize this later
+    this.numToGrade = 0; // by default, grader is not grading any subs
   }
 
   /**

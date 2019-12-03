@@ -103,6 +103,7 @@ class Graph {
    * @return {Edge[]|null} shortest path or null if no path exists
    */
   _findShortestPath() {
+    // Shortest path algorithm used: Dijkstra
     // Mark all nodes unvisited.
     const isVisited = {}; // nodeId => true if visited
 

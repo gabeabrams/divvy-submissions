@@ -12,12 +12,14 @@ const Submission = require('../classes/Submission');
 module.exports = (opts) => {
   // Deconstruct opts
   const { students, groups } = opts;
-  // If this is an individual assignment
+  // If this is an individual assignment, just create sub for each student
   if (!groups || groups.length === 0) {
     return students.map((student) => {
       return new Submission([student.id], student.isSubmitted);
     });
   }
+
+  // This is a group assignment
 
   // Pre-process students for quick lookup
   const studentIsSubmitted = {}; // studentId => isSubmitted
@@ -25,7 +27,7 @@ module.exports = (opts) => {
     studentIsSubmitted[student.id] = student.isSubmitted;
   });
 
-  // If this is a group assignment
+  // Create submission for each group
   return groups.map((group) => {
     // Check if anyone in the group has submitted
     const isSubmittedGroup = group.some((studentId) => {

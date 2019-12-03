@@ -163,7 +163,6 @@ describe('helpers > redefineConstraints', function () {
         Object.keys(
           violationMap[violationSub][violationGrader]
         ).forEach((type) => {
-          console.log('each is ', expectedViolations[i + 1][violationGrader][type], violationMap[violationSub][violationGrader][type]);
           // violationSub (submission ids) doesn't necessarily start at 1
           // if other tests that ran before this one have created submissions
           assert.equal(

@@ -24,7 +24,11 @@ describe('classes > Grader', function () {
     const bob = new Grader(fakeGraderId, fakeSubmissionsArr, fakePropWorkload);
 
     // Test initialize numToGrade
-    assert(bob.getNumToGrade() === -1, 'did not initialize numToGrade to -1');
+    assert.equal(
+      bob.getNumToGrade(),
+      0,
+      'did not initialize numToGrade to 0'
+    );
 
     // Test initialize proportionalWorkload
     assert.equal(

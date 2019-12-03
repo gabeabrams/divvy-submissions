@@ -15,7 +15,6 @@ class Node {
     this.metadata = metadata;
   }
 
-
   /**
    * Get node id
    * @return {number} the id of the node

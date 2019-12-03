@@ -1,8 +1,8 @@
 const assert = require('assert');
-const main = require('../index');
+const divvy = require('../index');
 
 describe('index', function () {
-  it('returns correct pairing and violations object', async function () {
+  it('returns correct pairing and violations object - test set 1', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
@@ -99,7 +99,7 @@ describe('index', function () {
       studentToGraderMap,
       workloadMap,
       constraintViolations,
-    } = main(opts);
+    } = divvy(opts);
 
     Object.keys(studentToGraderMap).forEach((studentId) => {
       assert.equal(
@@ -124,7 +124,7 @@ describe('index', function () {
     );
   });
 
-  it('returns correct pairing and violations object', async function () {
+  it('returns correct pairing and violations object - test set 2', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
@@ -197,7 +197,7 @@ describe('index', function () {
       listOfGradersInvolved: [2, 3],
     }];
 
-    const { constraintViolations } = main(opts);
+    const { constraintViolations } = divvy(opts);
 
     constraintViolations.forEach((violation, i) => {
       Object.keys(violation).forEach((violationField) => {
@@ -210,7 +210,7 @@ describe('index', function () {
     });
   });
 
-  it('returns correct pairing and violations object', async function () {
+  it('returns correct pairing and violations object - test set 3', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
@@ -272,7 +272,7 @@ describe('index', function () {
     };
 
     // running the algorithm
-    const { constraintViolations } = main(opts);
+    const { constraintViolations } = divvy(opts);
 
     const expectedDescription = 'This grader is banned from grading this submission.';
     const expectedType = 'banned';
@@ -331,21 +331,57 @@ describe('index', function () {
 
     // running this test multiple times can result in different pairings,
     // showing randomizaiton works
-    const { studentToGraderMap, constraintViolations } = main(opts);
+    let firstSolutionFound;
+    let secondSolutionFound;
+    for (let i = 0; i < 1000; i++) {
+      const { studentToGraderMap, constraintViolations } = divvy(opts);
 
-    // check that all student is assigned a grader
-    assert.equal(
-      Object.keys(studentToGraderMap).length,
-      students.length,
-      'not all students have been assigned'
-    );
+      // check that all student is assigned a grader
+      assert.equal(
+        Object.keys(studentToGraderMap).length,
+        students.length,
+        'not all students have been assigned'
+      );
 
-    // check if there are no constraint violations
-    assert.equal(
-      constraintViolations.length,
-      0,
-      'did not return correct violations'
-    );
+      // check if there are no constraint violations
+      assert.equal(
+        constraintViolations.length,
+        0,
+        'did not return correct violations'
+      );
+
+      // Figure out which solution this is
+      if (
+        studentToGraderMap[1]
+        && studentToGraderMap[1] === 1
+        && studentToGraderMap[2]
+        && studentToGraderMap[2] === 2
+      ) {
+        // First solution
+        firstSolutionFound = true;
+      } else if (
+        studentToGraderMap[1]
+        && studentToGraderMap[1] === 2
+        && studentToGraderMap[2]
+        && studentToGraderMap[2] === 1
+      ) {
+        // Second solution
+        secondSolutionFound = true;
+      } else {
+        // Invalid solution
+        throw new Error('Invalid solution');
+      }
+
+      // If both solutions are found, stop searching/iterating
+      if (firstSolutionFound && secondSolutionFound) {
+        break;
+      }
+    }
+
+    // Make sure we found both solutions
+    if (!firstSolutionFound || !secondSolutionFound) {
+      throw new Error('Ran randomized algorithm 1000 times and did not find variation in solutions');
+    }
   });
 
   it('returns randomized pairing w/ varying workloads', async function () {
@@ -394,7 +430,7 @@ describe('index', function () {
 
     // running this test multiple times can result in different pairings,
     // showing randomizaiton works
-    const { studentToGraderMap, constraintViolations } = main(opts);
+    const { studentToGraderMap, constraintViolations } = divvy(opts);
 
     // check that all student is assigned a grader
     assert.equal(
@@ -479,7 +515,7 @@ describe('index', function () {
     };
 
     // run the algorithm
-    const { studentToGraderMap } = main(opts);
+    const { studentToGraderMap } = divvy(opts);
 
     // check if studentToGraderMap matches expected result
     Object.keys(studentToGraderMap).forEach((studentId) => {
@@ -592,7 +628,7 @@ describe('index', function () {
       studentToGraderMap,
       workloadMap,
       constraintViolations,
-    } = main(opts);
+    } = divvy(opts);
 
     // check if studentToGraderMap matches expected result
     Object.keys(studentToGraderMap).forEach((studentId) => {
@@ -620,7 +656,7 @@ describe('index', function () {
     );
   });
 
-  it('returns correct pairing when required > workload', async function () {
+  it('returns correct pairing when grader is required by more subs than their workload', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
@@ -705,7 +741,7 @@ describe('index', function () {
       studentToGraderMap,
       workloadMap,
       constraintViolations,
-    } = main(opts);
+    } = divvy(opts);
 
     // check if studentToGraderMap matches expected result
     Object.keys(studentToGraderMap).forEach((studentId) => {
@@ -822,7 +858,7 @@ describe('index', function () {
       studentToGraderMap,
       workloadMap,
       constraintViolations,
-    } = main(opts);
+    } = divvy(opts);
 
     // check if studentToGraderMap matches expected result
     Object.keys(studentToGraderMap).forEach((studentId) => {
@@ -854,7 +890,7 @@ describe('index', function () {
     });
   });
 
-  it('returns correct pairing w/ more graders than student', async function () {
+  it('returns correct pairing w/ more graders than students', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
       {
@@ -909,7 +945,7 @@ describe('index', function () {
     const {
       workloadMap,
       constraintViolations,
-    } = main(opts);
+    } = divvy(opts);
 
     // check that one and only one grader is not grading any students
     assert.equal(
@@ -971,7 +1007,7 @@ describe('index', function () {
     };
 
     // running the algorithm, a random grader will get assigned 2 students
-    const { studentToGraderMap, constraintViolations } = main(opts);
+    const { studentToGraderMap, constraintViolations } = divvy(opts);
 
     // check that all student is assigned a grader
     assert.equal(
