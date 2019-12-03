@@ -826,8 +826,6 @@ describe('index', function () {
 
     // check if studentToGraderMap matches expected result
     Object.keys(studentToGraderMap).forEach((studentId) => {
-      console.log('the two values are ', studentToGraderMap[studentId], expectedStudentToGrader[studentId]);
-      console.log('student id is ', studentId);
       assert.equal(
         studentToGraderMap[studentId],
         expectedStudentToGrader[studentId],
