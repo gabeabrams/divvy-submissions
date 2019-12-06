@@ -44,34 +44,63 @@ import divvy from 'divvy-submissions';
 
 ### Interpreting Results
 
-// TODO: big picture summary of results
-// - The algorithm will return three objects: studentToGraderMap which tells you XXXX, workloadMap which ...., and constraintViolations
+The algorithm will return three objects: studentToGraderMap shows which student is graded by which grader; workloadMap shows how many submissions each grader is assigned to grade; and constraintViolations is a list of constraints of banned/required pairs the algorithm broke while trying to assign each student to a grader. 
+
 
 #### studentToGraderMap
 
-// TODO: go into detail about structure of object, how to look up who is assigned to whom
+studentToGraderMap { studentId => graderId } can be used to look up a student's assigned grader, or, with slight modification, to look up which student a grader is assigned to grade. <br />
+An example of looking up the assigned grader for the student whose studentId is 1 is `studentToGradermap[1]`. <br />
+An example of converting the map from a { studentId => graderId } format to a { graderId => studentId[] } format so that it's easier to look up the list of students a specific grader is assigned to grader is:
 
-// TODO: Example of reversing to find the student assigned to each grader: (map: graderId => studentId[])
+```js
+let graderToStudentMap = {};
+// Go through each student and add them under their assigned grader
+Object.keys(studentToGraderMap).forEach((studentId)=> {
+	// find the assinged graderId for this student
+	const graderId = studentToGraderMap[studentId];
+	// add this student into the array of students the grader is grading
+	if (!graderToStudentMap) {
+		graderToStudentMap[graderId] = [];
+		graderToStudentMap[graderId].push(studentId);
+	} else {
+		graderToStudentMap[graderId].push(studentId);
+	}
+});
+```
 
 #### workloadMap
 
-// TODO: go into detail, reiterate that the workload will sum to the number of submissions, and workload is divvied up according to proportionalWorkload
+workloadMap { graderId => numToGrade } is for looking up how many submissions a grader has been assigned to grade. A submission is different than a student. In the case of group assignments, all the students in the same group will be in the same submission. It will be easier for them to all be graded by the same grader as there are similarities between their work. In the case of individual assignments, each submission will correspond to each individual student. If you are more interested in which students a specific grader has been assigned to grade, please refer to the example above that converts the studentToGraderMap. <br />
+
+Workload is divvied up according to proportionalWorkload provided with each grader. For example, in the case where there are two graders: grader 1 has a proportionalWorkload of 1 and grader 2 has a proportionalWorkload of 2; 3 submission; and no banned/required pairs constraints: grader 1 will be randomly assinged one of the three submissions, while grader 2 will be assinged the other two. More complicated cases where submissions can't be evenly divided is explained in the "More on the algorithms" section at the end.
 
 #### constraintViolations
 
-// TODO: explain the different types of violations and why they occur and how we handle them
+Sometimes the algorithm has to break the banned/required pairs constraints in order to assign each submission to a grader. If this happens, we return an array of violation object in the following format to notice admins about these unavoidable violations.
 
-_Violation Type 1: alkjsldfja_
+```js
+{
+	englishDescription: <string description for user>,
+	type: <'banned' or 'required'>,
+	listOfStudentsInvolved: <array of student ids>,
+	listOfGradersInvolved: <array of grader ids>,
+ }
+```
 
-> laskdjf
-> lskdjfwe
-> asldkjf
+There are a totle of 3 different kinds of violations that can happen throughout the algorithm:
 
-_Violation Type 2: alkjsldfja_
+_Violation Type 1: A grader is grading a submission that is banned_
 
-> laskdjf
-> lskdjfwe
-> asldkjf
+> We ask each grader to identify who is their friend in the list of students, so that we can hopefully assign them to someone else in order to avoid a conflict of interests. But this constraint doesn't always work out when a grader is friends with many students. 
+
+_Violation Type 2: A grader is grading a submission that is required to be graded by another grader_
+
+> In some cases, a grader is required to grade certain students. However, when the number of submissions this grader is required to grade exceeds their workload, the extra submissions will need to be graded by someone else, violating the required pairing constraint.
+
+_Violation Type 3: Multiple graders are required to grade the same submission, impossible constraint_
+
+> When more than one grader is required to grade the same submission, it is impossible to avoid a violation no matter who we assign this submission to. Since this kind of violations occured before the algorithm is even run, we decided to store them in a separate array and remove that student from all graders' required grading list so that it doesn't impact the result of the algorithm. We then return the union this pre-occured violations array and the violations that are generated through running the algorithm as constraintViolations.
 
 ## Examples
 
