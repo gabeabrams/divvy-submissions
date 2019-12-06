@@ -33,11 +33,14 @@ import divvy from 'divvy-submissions';
 
 ### Arguments
 
-// TODO: nice looking table with the following cols:
-// - argument name
-// - argument type
-// - description of argument
-// - required/default (write "Required" if it is a required arg or include the default value if it is optional)
+| Name        | Type           | Description  | Required/Optional |
+| :------------- | :------------- | :----- | :----- |
+| students      | object[] | the full list of student entries in the form: { id, isSubmitted } | required|
+| graders      | object[]      |  the full list of grader entries in the form: { id, proportionalWorkload } where proportionalWorkload is a number representing how many submissions this grader will grade compared with other graders. For example, with a proportionalWorkload of 1, they grade a normal amount. With a proportionalWorkload of 2, they grade double as much as others. With a proportionalWorkload of 0.7, they grade 70% as much as other graders. | required|
+| bannedPairs | object[]     |    a list of pairs in the form { grader: <grader id>, student: <student id> } where in each pair, the specified grader is not allowed to grade the specified student | This is an optional argument. The default value is an empty array. |
+| requiredPairs      | object[] | a list of pairs in the form { grader: <grader id>, student: <student id> } where in each pair, the specified grader must grade the specified student| This is an optional argument. The default value is an empty array.|
+| groups      | number[][]    |   if the assignment is a group assignment, this is a list of id arrays where each id array represents the ids of students in a specific group | This is an optional argument. The default value is undefined. |
+| isDeterministic | boolean |   if true, pairings won't be randomized, so you'll get the same results if you repeatedly run this algorithm | This is an optional argument. The default value is undefined so that the result will always be randomized|
 
 ### Interpreting Results
 
