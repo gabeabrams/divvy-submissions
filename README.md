@@ -4,12 +4,47 @@ A script that takes a list of graders and submissions, and divvies up the submis
 
 ## Quickstart
 
-// TODO: a very short description and a couple examples
-- Install very briefly
-- Very rough description of what you can include + see Usage for more info
-- Example 1: very very basic one (but full with import and everything)
-- Example 2: varying workload
-- You can ban certain graders, do other stuff, etc. see Usage section
+Install using `npm install divvy-submissions --save` into your npm project. Divvy's main purpose is to assign each student to a grader, and it can run in different contexts and will adhere to different constraints. It works with both group assignments and individual assignments; it allows the user to assign varying workloads among graders so that some grader can choose to grade more or less than others; it allows the user to ban certain pairings between graders and students; and it allows the user to require certain graders to grade specified submissions. To learn more about how to use divvy, please refer to the Usage section below.
+
+A simple example for using divvy:
+
+```js
+// import divvy
+const divvy = require('divvy-submissions');
+
+// sample grader object array with different proportinalWorkload
+const graders = [
+	{
+		id: 1,
+		proportionalWorkload: 1,
+	}, 
+	{
+		id: 2,
+       proportionalWorkload: 2,
+    },
+];
+
+// sample student object array
+const students = [
+	{
+       id: 1,
+       isSubmitted: true,
+    },
+    {
+       id: 2,
+       isSubmitted: true,
+    },
+    {
+       id: 3,
+       isSubmitted: true,
+    },
+];
+
+// call the divvy function, which will assign each student 
+// to an assigned grader in a fair, random way
+const res = divvy({graders, students});
+
+```
 
 ## Usage
 
@@ -49,8 +84,10 @@ The algorithm will return three objects: studentToGraderMap shows which student 
 
 #### studentToGraderMap
 
-studentToGraderMap { studentId => graderId } can be used to look up a student's assigned grader, or, with slight modification, to look up which student a grader is assigned to grade. <br />
-An example of looking up the assigned grader for the student whose studentId is 1 is `studentToGradermap[1]`. <br />
+studentToGraderMap { studentId => graderId } can be used to look up a student's assigned grader, or, with slight modification, to look up which student a grader is assigned to grade. 
+
+An example of looking up the assigned grader for the student whose studentId is 1 is `studentToGradermap[1]`.
+
 An example of converting the map from a { studentId => graderId } format to a { graderId => studentId[] } format so that it's easier to look up the list of students a specific grader is assigned to grader is:
 
 ```js
@@ -71,7 +108,7 @@ Object.keys(studentToGraderMap).forEach((studentId)=> {
 
 #### workloadMap
 
-workloadMap { graderId => numToGrade } is for looking up how many submissions a grader has been assigned to grade. A submission is different than a student. In the case of group assignments, all the students in the same group will be in the same submission. It will be easier for them to all be graded by the same grader as there are similarities between their work. In the case of individual assignments, each submission will correspond to each individual student. If you are more interested in which students a specific grader has been assigned to grade, please refer to the example above that converts the studentToGraderMap. <br />
+workloadMap { graderId => numToGrade } is for looking up how many submissions a grader has been assigned to grade. A submission is different than a student. In the case of group assignments, all the students in the same group will be in the same submission. It will be easier for them to all be graded by the same grader as there are similarities between their work. In the case of individual assignments, each submission will correspond to each individual student. If you are more interested in which students a specific grader has been assigned to grade, please refer to the example above that converts the studentToGraderMap. 
 
 Workload is divvied up according to proportionalWorkload provided with each grader. For example, in the case where there are two graders: grader 1 has a proportionalWorkload of 1 and grader 2 has a proportionalWorkload of 2; 3 submission; and no banned/required pairs constraints: grader 1 will be randomly assinged one of the three submissions, while grader 2 will be assinged the other two. More complicated cases where submissions can't be evenly divided is explained in the "More on the algorithms" section at the end.
 
