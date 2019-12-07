@@ -4,9 +4,9 @@ A script that takes a list of graders and submissions, and divvies up the submis
 
 ## Quickstart
 
-Install using `npm install divvy-submissions --save` into your npm project. Divvy's main purpose is to assign each student to a grader, and it can run in different contexts and will adhere to different constraints. It works with both group assignments and individual assignments; it allows the user to assign varying workloads among graders so that some grader can choose to grade more or less than others; it allows the user to ban certain pairings between graders and students; and it allows the user to require certain graders to grade specified submissions. To learn more about how to use divvy, please refer to the Usage section below.
+Install using `npm install divvy-submissions --save` into your npm project. Divvy's main purpose is to assign each student to a grader, and it is easily customizable under different assignment types and grading constraints. It works with both group assignments and individual assignments; it allows each grader to choose their own workload; it also takes into account that sometimes a grader is banned from grading a student due to conflict of interests, or required to grade a student for specific reasons. To learn more about how to customize divvy, please refer to the Usage section below.
 
-A simple example for using divvy:
+Here's an example on how to import and use divvy after installing:
 
 ```js
 // import divvy
@@ -147,22 +147,381 @@ Intro: these are some helpful examples.
 
 ### Example 2: _divvy up with varying workload: double grader and someone who is sick and grading 75% the usual workload_
 
+```js
+// import divvy
+const divvy = require('divvy-submissions');
+
+const graders = [
+	// regular grader
+	{
+		id: 1,
+		proportionalWorkload: 1,
+	},
+	// double grader
+	{
+		id: 2,
+       proportionalWorkload: 2,
+    },
+    // grader who is sick and grading 75% of the usual workload
+    {
+		id: 3,
+       proportionalWorkload: 0.75,
+    },
+];
+
+// sample student object array
+const students = [
+	{
+       id: 1,
+       isSubmitted: true,
+    },
+    {
+       id: 2,
+       isSubmitted: true,
+    },
+    {
+       id: 3,
+       isSubmitted: true,
+    },
+    {
+       id: 4,
+       isSubmitted: true,
+    },
+];
+
+// call the divvy function
+const res = divvy({graders, students});
+
+```
+
+
 ### Example 3: _required pairs_
+
+```js
+// import divvy
+const divvy = require('divvy-submissions');
+
+// sample graders
+const graders = [
+	// regular grader
+	{
+		id: 1,
+		proportionalWorkload: 1,
+	},
+	// double grader
+	{
+		id: 2,
+       proportionalWorkload: 1,
+    },
+];
+
+// sample students array
+const students = [
+	{
+       id: 1,
+       isSubmitted: true,
+    },
+    {
+       id: 2,
+       isSubmitted: true,
+    },
+];
+
+// required pairings
+const requiredPairs = [
+	// grader with id 1 is required to grade the submission 
+	// that contains the student with id 2
+	{
+       grader: 1,
+       student: 2,
+    },
+];
+
+// call the divvy function
+const res = divvy({graders, students, requiredPairs});
+
+```
 
 ### Example 4: _banned pairs_
 
+```js
+// import divvy
+const divvy = require('divvy-submissions');
+
+// sample graders
+const graders = [
+	// regular grader
+	{
+		id: 1,
+		proportionalWorkload: 1,
+	},
+	// double grader
+	{
+		id: 2,
+       proportionalWorkload: 1,
+    },
+];
+
+// sample students array
+const students = [
+	{
+       id: 1,
+       isSubmitted: true,
+    },
+    {
+       id: 2,
+       isSubmitted: true,
+    },
+];
+
+// banned pairings
+const bannedPairs = [
+	// grader with id 1 is banned to grade the submission 
+	// that contains the student with id 2
+	{
+       grader: 1,
+       student: 2,
+    },
+];
+
+// call the divvy function
+const res = divvy({graders, students});
+
+```
+
 ### Example 5: _group assignment_
+
+```js
+// import divvy
+const divvy = require('divvy-submissions');
+
+// sample graders
+const graders = [
+	// regular grader
+	{
+		id: 1,
+		proportionalWorkload: 1,
+	},
+	// double grader
+	{
+		id: 2,
+       proportionalWorkload: 1,
+    },
+];
+
+// sample students array
+const students = [
+	{
+       id: 1,
+       isSubmitted: true,
+    },
+    {
+       id: 2,
+       isSubmitted: true,
+    },
+    {
+       id: 3,
+       isSubmitted: true,
+    },
+];
+
+// This sample groups array specifies that student with id 1 is in a group,
+// students with ids 2 and 3 are in another group together. 
+const groups = [[1], [2, 3]];
+
+// call the divvy function
+const res = divvy({graders, students, groups});
+
+```
 
 ### Example 6: _want same student to grader map every time (deterministic)_
 
+The isDeterministic property of the algorithm controls whether the pairing is randomized or not in the case where submissions can be evenly divided among graders. This is best illustrated with an example:
+
+Suppose we have 2 graders and 2 students, with no grading constraints:
+
+```js
+// import divvy
+const divvy = require('divvy-submissions');
+
+// sample graders
+const graders = [
+	// regular grader
+	{
+		id: 1,
+		proportionalWorkload: 1,
+	},
+	// double grader
+	{
+		id: 2,
+       proportionalWorkload: 1,
+    },
+];
+
+// sample students array
+const students = [
+	{
+       id: 1,
+       isSubmitted: true,
+    },
+    {
+       id: 2,
+       isSubmitted: true,
+    },
+];
+
+// call the divvy function
+const res = divvy({graders, students, groups});
+``` 
+This algorithm will have 2 solutions for pairing. Solution 1 is grader 1 grading student 1, grader 2 grading student 2. Solution 2 is grader 1 grading student 2, and grader 2 grading student 1. Because we didn't set the isDeterministic augument, the algorithm will return randomized result, with 50 percent of the time returning solution 1 and 50 percent solution 2. 
+
+However, if we want a deterministic result to verify the pairings ourselves, we can set the isDeterministic parameter to true. 
+
+```js
+// call the divvy function
+const res = divvy({
+	graders,
+	students,
+	bannedPairs,
+	requiredPairs,
+	isDeterministic = true,
+});
+
+```
+The example function call above will always return solution 1.
+
 ### Example 7: _all-in-one example with everything above_
+
+
+```js
+// import divvy
+const divvy = require('divvy-submissions');
+
+// sample graders
+const graders = [
+	// regular grader
+	{
+		id: 1,
+		proportionalWorkload: 1,
+	},
+	// double grader
+	{
+		id: 2,
+       proportionalWorkload: 2,
+    },
+];
+
+// sample students array
+const students = [
+	{
+       id: 1,
+       isSubmitted: true,
+    },
+    {
+       id: 2,
+       isSubmitted: true,
+    },
+    {
+       id: 3,
+       isSubmitted: true,
+    },
+    {
+       id: 4,
+       isSubmitted: true,
+    },
+    {
+       id: 5,
+       isSubmitted: true,
+    },
+    {
+       id: 6,
+       isSubmitted: true,
+    },
+];
+
+// banned pairings
+const bannedPairs = [
+	{
+       grader: 1,
+       student: 2,
+    },
+    {
+       grader: 1,
+       student: 3,
+    },
+    {
+       grader: 1,
+       student: 4,
+    },
+];
+
+// required pairings
+const requiredPairs = [
+	{
+       grader: 1,
+       student: 1,
+    },
+    {
+       grader: 2,
+       student: 2,
+    },
+    {
+       grader: 2,
+       student: 6,
+    },
+];
+
+// isDeterministic
+const isDeterministic = true;
+
+// call the divvy function
+const res = divvy({
+	graders,
+	students,
+	bannedPairs,
+	requiredPairs,
+	isDeterministic,
+});
+
+/*
+The expected studentToGraderMap returned in this case is:
+{
+	1: 1,
+	2: 2,
+	3: 2,
+	4: 2,
+	5: 1,
+	6: 2,
+ };
+ 
+ The expected workloadMap returned is:
+ {
+ 	// grader 1 is grading 2 submissions, grader 2 is grading 4 submissions
+ 	1: 2,
+ 	2: 4,
+ }
+ 
+ The expected constraintViolations returned should be an empty array as
+ this assignment doesn't violate any constraints
+*/
+
+```
+
 
 ## More on the Algorithm: How we Divvy Submissions
 
-// TODO:
-- how we use proportionalWorkload to approximately distribute workload
-- how we are random in which grader(s) are given extra workload
-- Secion on group assignments:
-- if one student is banned, the whole submission for a group is banned
-- if one student is required, the whole group is required
-- the whole group submission counts as one thing to grade
+### How we approximately distribute workload randomly
+
+First, we sum up all the proportional workload provided by the graders list. In order to acheive an evenly distributed workload, we follow the equation that the ratio between the proportional workload of a specific grader over the total proportional workload we summed up earlier equals to the actual number of submissions this grader should grader over the total number of submissions. With slight manipulation, the number of actual submissions a specific grader should grade is calculated by (total number of submissions/total amount of proportional workload) * proportional workload of that grader. 
+
+For example, assume we have 3 graders with proportional workload of 1, 2, and 2, and we have a total number of 6 submissions. First we sum up the total proportional workload, 5 in this case. The ratio of total number of submissions/total amount of proportional workload is a 6/5 = 1.2, which remains constant. For each grader, we multiply this ratio by their proportional workload. So in this case, we have grader 1 grading 1 * 1.2 = 1.2 submissions, grader 2 and 3 grading 2 * 1.2 = 2.4 submissions each. Because we can't split up a submission, we decided to floor each number, so grader 1 grades 1 sub, grader 2 and 3 grade 2 subs, and randomly distribute however many submissions left over.
+
+After the initial distribution, we have 1 submission left over, which we need to randomly distribute to a grader. In order to take their proportional workload into account, we decided to represent each grader as an interval, with the length of the interval equaling to their proportional workload. In this case, the following graph represent the intervals:
+
+|---(length = 1) ---|------(length = 2)------|------(length = 2)------|
+
+We then randomly generate a number between 0 and 5 so that this number will fall in one of the intervals. We then assign this submission to the grader corresponding to the interval that the number falls in. 
+
+### Group assignments
+
+In group assignments, the whole group submission counts as one thing to grade because students within a group submit similar work. The ban/required pairing constraints also extends to group assignments. If a grader is banned or required to grade one student within a group, then the grader is banned/required to grade the whole submission. 
