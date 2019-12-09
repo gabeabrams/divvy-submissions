@@ -12,7 +12,7 @@ Here's an example on how to import and use divvy after installing:
 // import divvy
 const divvy = require('divvy-submissions');
 
-// sample grader object array with different proportinalWorkload
+// sample grader object array with different proportionalWorkload
 const graders = [
   {
     id: 1,
@@ -92,7 +92,7 @@ const {
 
 studentToGraderMap `{ studentId => graderId }` can be used to look up a student's assigned grader, or, with slight modification, to look up which student a grader is assigned to grade.
 
-An example of looking up the assigned grader for the student whose studentId is 1 is `studentToGradermap[1]`.
+An example of looking up the assigned grader for the student whose studentId is 1 is `studentToGraderMap[1]`.
 
 An example of converting the map from a `{ studentId => graderId }` format to a `{ graderId => studentId[] }` format so that it's easier to look up the list of students a specific grader is assigned to grader is:
 
@@ -127,7 +127,7 @@ Sometimes the algorithm has to break the banned/required pairs constraints in or
   type: <'banned' or 'required'>,
   listOfStudentsInvolved: <array of student ids>,
   listOfGradersInvolved: <array of grader ids>,
- }
+}
 ```
 
 There are a total of 3 different kinds of violations that can happen throughout the algorithm:
@@ -195,7 +195,7 @@ const students = [
 ];
 
 // call the divvy function
-const res = divvy({graders, students});
+const res = divvy({ graders, students });
 
 ```
 
@@ -245,7 +245,7 @@ const requiredPairs = [
 ];
 
 // call the divvy function
-const res = divvy({graders, students, requiredPairs});
+const res = divvy({ graders, students, requiredPairs });
 
 ```
 
@@ -294,7 +294,7 @@ const bannedPairs = [
 ];
 
 // call the divvy function
-const res = divvy({graders, students});
+const res = divvy({ graders, students });
 
 ```
 
@@ -341,7 +341,7 @@ const students = [
 const groups = [[1], [2, 3]];
 
 // call the divvy function
-const res = divvy({graders, students, groups});
+const res = divvy({ graders, students, groups });
 
 ```
 
@@ -463,7 +463,7 @@ const res = divvy({
 
 ### How we approximately distribute workload randomly
 
-First, we sum up all the proportional workload provided by the graders list. In order to acheive an evenly distributed workload, we follow the equation that the ratio between the proportional workload of a specific grader over the total proportional workload we summed up earlier equals to the actual number of submissions this grader should grader over the total number of submissions. With slight manipulation, the number of actual submissions a specific grader should grade is calculated by (total number of submissions/total amount of proportional workload) * proportional workload of that grader.
+First, we sum up all the proportional workload provided by the graders list. In order to achieve an evenly distributed workload, we follow the equation that the ratio between the proportional workload of a specific grader over the total proportional workload we summed up earlier equals to the actual number of submissions this grader should grader over the total number of submissions. With slight manipulation, the number of actual submissions a specific grader should grade is calculated by (total number of submissions/total amount of proportional workload) * proportional workload of that grader.
 
 For example, assume we have 3 graders with proportional workload of 1, 2, and 2, and we have a total number of 6 submissions. First we sum up the total proportional workload, 5 in this case. The ratio of total number of submissions/total amount of proportional workload is a 6/5 = 1.2, which remains constant. For each grader, we multiply this ratio by their proportional workload. So in this case, we have grader 1 grading 1 * 1.2 = 1.2 submissions, grader 2 and 3 grading 2 * 1.2 = 2.4 submissions each. Because we can't split up a submission, we decided to floor each number, so grader 1 grades 1 sub, grader 2 and 3 grade 2 subs, and randomly distribute however many submissions left over.
 
