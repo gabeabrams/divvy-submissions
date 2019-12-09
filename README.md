@@ -17,7 +17,7 @@ const graders = [
 	{
 		id: 1,
 		proportionalWorkload: 1,
-	}, 
+	},
 	{
 		id: 2,
        proportionalWorkload: 2,
@@ -40,7 +40,7 @@ const students = [
     },
 ];
 
-// call the divvy function, which will assign each student 
+// call the divvy function, which will assign each student
 // to an assigned grader in a fair, random way
 const res = divvy({ graders, students });
 
@@ -90,7 +90,7 @@ const {
 
 #### studentToGraderMap
 
-studentToGraderMap `{ studentId => graderId }` can be used to look up a student's assigned grader, or, with slight modification, to look up which student a grader is assigned to grade. 
+studentToGraderMap `{ studentId => graderId }` can be used to look up a student's assigned grader, or, with slight modification, to look up which student a grader is assigned to grade.
 
 An example of looking up the assigned grader for the student whose studentId is 1 is `studentToGradermap[1]`.
 
@@ -113,9 +113,9 @@ Object.keys(studentToGraderMap).forEach((studentId)=> {
 
 #### workloadMap
 
-workloadMap `{ graderId => numToGrade }` is for looking up how many submissions a grader has been assigned to grade. A submission is different than a student. In the case of group assignments, all the students in the same group will be in the same submission. It will be easier for them to all be graded by the same grader as there are similarities between their work. In the case of individual assignments, each submission will correspond to each individual student. If you are more interested in which students a specific grader has been assigned to grade, please refer to the example above that converts the `studentToGraderMap`. 
+workloadMap `{ graderId => numToGrade }` is for looking up how many submissions a grader has been assigned to grade. A submission is different than a student. In the case of group assignments, all the students in the same group will be in the same submission. It will be easier for them to all be graded by the same grader as there are similarities between their work. In the case of individual assignments, each submission will correspond to each individual student. If you are more interested in which students a specific grader has been assigned to grade, please refer to the example above that converts the `studentToGraderMap`.
 
-Workload is divvied up according to `proportionalWorkload` provided with each grader. For example, in the case where there are two graders: grader 1 has a proportionalWorkload of 1 and grader 2 has a `proportionalWorkload` of 2; 3 submission; and no banned/required pairs constraints: grader 1 will be randomly assinged one of the three submissions, while grader 2 will be assinged the other two. More complicated cases where submissions can't be evenly divided is explained in the [More on the algorithms](#more-on-the-algorithm--how-we-divvy-submissions) section at the end.
+Workload is divvied up according to `proportionalWorkload` provided with each grader. For example, in the case where there are two graders: grader 1 has a proportionalWorkload of 1 and grader 2 has a `proportionalWorkload` of 2; 3 submission; and no banned/required pairs constraints: grader 1 will be randomly assinged one of the three submissions, while grader 2 will be assinged the other two. More complicated cases where submissions can't be evenly divided is explained in the [More on the algorithms](#more-on-the-algorithm-how-we-divvy-submissions) section at the end.
 
 #### constraintViolations
 
@@ -134,7 +134,7 @@ There are a totle of 3 different kinds of violations that can happen throughout 
 
 _Violation Type 1: A grader is grading a submission that is banned_
 
-> We ask each grader to identify who is their friend in the list of students, so that we can hopefully assign them to someone else in order to avoid a conflict of interests. But this constraint doesn't always work out when a grader is friends with many students. 
+> We ask each grader to identify who is their friend in the list of students, so that we can hopefully assign them to someone else in order to avoid a conflict of interests. But this constraint doesn't always work out when a grader is friends with many students.
 
 _Violation Type 2: A grader is grading a submission that is required to be graded by another grader_
 
@@ -146,7 +146,7 @@ _Violation Type 3: Multiple graders are required to grade the same submission, i
 
 ## Examples
 
-Intro: these are some helpful examples. 
+Intro: these are some helpful examples.
 
 ### Example 1: Varying Workloads
 
@@ -236,7 +236,7 @@ const students = [
 
 // required pairings
 const requiredPairs = [
-	// grader with id 1 is required to grade the submission 
+	// grader with id 1 is required to grade the submission
 	// that contains the student with id 2
 	{
        grader: 1,
@@ -285,7 +285,7 @@ const students = [
 
 // banned pairings
 const bannedPairs = [
-	// grader with id 1 is banned to grade the submission 
+	// grader with id 1 is banned to grade the submission
 	// that contains the student with id 2
 	{
        grader: 1,
@@ -337,7 +337,7 @@ const students = [
 ];
 
 // This sample groups array specifies that student with id 1 is in a group,
-// students with ids 2 and 3 are in another group together. 
+// students with ids 2 and 3 are in another group together.
 const groups = [[1], [2, 3]];
 
 // call the divvy function
@@ -444,14 +444,14 @@ const res = divvy({
 		5: 1,
 		6: 2,
 	};
-	 
+
 	The expected workloadMap returned is:
 	{
 		// grader 1 is grading 2 submissions, grader 2 is grading 4 submissions
 	 	1: 2,
 	 	2: 4,
 	}
-	 
+
 	The expected constraintViolations returned should be an empty array as
 	this assignment doesn't violate any constraints
 */
@@ -463,7 +463,7 @@ const res = divvy({
 
 ### How we approximately distribute workload randomly
 
-First, we sum up all the proportional workload provided by the graders list. In order to acheive an evenly distributed workload, we follow the equation that the ratio between the proportional workload of a specific grader over the total proportional workload we summed up earlier equals to the actual number of submissions this grader should grader over the total number of submissions. With slight manipulation, the number of actual submissions a specific grader should grade is calculated by (total number of submissions/total amount of proportional workload) * proportional workload of that grader. 
+First, we sum up all the proportional workload provided by the graders list. In order to acheive an evenly distributed workload, we follow the equation that the ratio between the proportional workload of a specific grader over the total proportional workload we summed up earlier equals to the actual number of submissions this grader should grader over the total number of submissions. With slight manipulation, the number of actual submissions a specific grader should grade is calculated by (total number of submissions/total amount of proportional workload) * proportional workload of that grader.
 
 For example, assume we have 3 graders with proportional workload of 1, 2, and 2, and we have a total number of 6 submissions. First we sum up the total proportional workload, 5 in this case. The ratio of total number of submissions/total amount of proportional workload is a 6/5 = 1.2, which remains constant. For each grader, we multiply this ratio by their proportional workload. So in this case, we have grader 1 grading 1 * 1.2 = 1.2 submissions, grader 2 and 3 grading 2 * 1.2 = 2.4 submissions each. Because we can't split up a submission, we decided to floor each number, so grader 1 grades 1 sub, grader 2 and 3 grade 2 subs, and randomly distribute however many submissions left over.
 
@@ -473,7 +473,7 @@ After the initial distribution, we have 1 submission left over, which we need to
 |–––(length = 1)–––|––––––(length = 2)––––––|––––––(length = 2)––––––|
 </div>
 
-We then randomly generate a number between 0 and 5 so that this number will fall in one of the intervals. We then assign this submission to the grader corresponding to the interval that the number falls in. 
+We then randomly generate a number between 0 and 5 so that this number will fall in one of the intervals. We then assign this submission to the grader corresponding to the interval that the number falls in.
 
 ### Group assignments
 
