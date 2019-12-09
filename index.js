@@ -82,6 +82,17 @@ module.exports = (opts) => {
   ({ graders } = returnedConstraint);
 
   /* ------------ 3. Calculate workloads, shuffle graders ----------- */
+  // If graders are missing proportionalWorkloads, set it to 1
+  graders = graders.map((grader) => {
+    const newGrader = grader;
+
+    if (grader.proportionalWorkload === undefined) {
+      newGrader.proportionalWorkload = 1;
+    }
+
+    return newGrader;
+  });
+
   graders = calculateWorkloads(graders, submissions.length);
 
   // randomize the array
