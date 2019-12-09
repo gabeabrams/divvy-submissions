@@ -289,6 +289,80 @@ describe('index', function () {
     );
   });
 
+  it('returns correct pairing when both required and banned to grade a submissions', async function () {
+    // the full list of student entries in the form: { id, isSubmitted }
+    const students = [
+      {
+        id: 1,
+        isSubmitted: true,
+      },
+      {
+        id: 2,
+        isSubmitted: true,
+      },
+    ];
+
+    // a list of id arrays where each id array represents
+    // the ids of students in a specific group
+    const groups = [[1, 2]];
+
+    // the full list of grader entries in the form: { id, proportionalWorkload }
+    const graders = [
+      {
+        id: 1,
+        proportionalWorkload: 1,
+      },
+    ];
+
+    // a list of pairs in the form:
+    // { grader: <grader id>, student: <student id> }
+    const bannedPairs = [
+      {
+        grader: 1,
+        student: 2,
+      },
+    ];
+
+    // a list of pairs in the form:
+    // { grader: <grader id>, student: <student id> }
+    const requiredPairs = [
+      {
+        grader: 1,
+        student: 1,
+      },
+    ];
+
+    const opts = {
+      students,
+      graders,
+      bannedPairs,
+      requiredPairs,
+      groups,
+      isDeterministic: true,
+    };
+
+    const expectedViolations = [{
+      englishDescription: 'This grader is banned from grading this submission.',
+      type: 'banned',
+      listOfStudentsInvolved: [1, 2],
+      listOfGradersInvolved: [1],
+    }];
+
+    // running the algorithm
+    const { constraintViolations } = divvy(opts);
+
+    // check if constraintViolations matches expected result
+    constraintViolations.forEach((violation, i) => {
+      Object.keys(violation).forEach((violationField) => {
+        assert.equal(
+          JSON.stringify(violation[violationField]),
+          JSON.stringify(expectedViolations[i][violationField]),
+          'did not return correct violations'
+        );
+      });
+    });
+  });
+
   it('returns correct pairing with randomization', async function () {
     // the full list of student entries in the form: { id, isSubmitted }
     const students = [
@@ -430,21 +504,72 @@ describe('index', function () {
 
     // running this test multiple times can result in different pairings,
     // showing randomizaiton works
-    const { studentToGraderMap, constraintViolations } = divvy(opts);
+    let firstSolutionFound;
+    let secondSolutionFound;
+    let thirdSolutionFound;
+    for (let i = 0; i < 1000; i++) {
+      const { studentToGraderMap, constraintViolations } = divvy(opts);
 
-    // check that all student is assigned a grader
-    assert.equal(
-      Object.keys(studentToGraderMap).length,
-      students.length,
-      'not all students have been assigned'
-    );
+      // check that all student is assigned a grader
+      assert.equal(
+        Object.keys(studentToGraderMap).length,
+        students.length,
+        'not all students have been assigned'
+      );
 
-    // check if there are no constraint violations
-    assert.equal(
-      constraintViolations.length,
-      0,
-      'did not return correct violations'
-    );
+      // check if there are no constraint violations
+      assert.equal(
+        constraintViolations.length,
+        0,
+        'did not return correct violations'
+      );
+
+      // Figure out which solution this is
+      if (
+        studentToGraderMap[1]
+        && studentToGraderMap[1] === 1
+        && studentToGraderMap[2]
+        && studentToGraderMap[2] === 1
+        && studentToGraderMap[3]
+        && studentToGraderMap[3] === 2
+      ) {
+        // First solution
+        firstSolutionFound = true;
+      } else if (
+        studentToGraderMap[1]
+        && studentToGraderMap[1] === 1
+        && studentToGraderMap[2]
+        && studentToGraderMap[2] === 2
+        && studentToGraderMap[3]
+        && studentToGraderMap[3] === 1
+      ) {
+        // Second solution
+        secondSolutionFound = true;
+      } else if (
+        studentToGraderMap[1]
+        && studentToGraderMap[1] === 2
+        && studentToGraderMap[2]
+        && studentToGraderMap[2] === 1
+        && studentToGraderMap[3]
+        && studentToGraderMap[3] === 1
+      ) {
+        // Third solution
+        thirdSolutionFound = true;
+      } else {
+        // Invalid solution
+        throw new Error('Invalid solution');
+      }
+
+      // If both solutions are found, stop searching/iterating
+      if (firstSolutionFound && secondSolutionFound && thirdSolutionFound) {
+        break;
+      }
+    }
+
+    // Make sure we found both solutions
+    if (!firstSolutionFound || !secondSolutionFound || !thirdSolutionFound) {
+      throw new Error('Ran randomized algorithm 1000 times and did not find variation in solutions');
+    }
   });
 
   it('returns correct pairing in group assignment', async function () {

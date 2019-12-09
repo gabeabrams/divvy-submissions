@@ -51,18 +51,26 @@ module.exports = (opts) => {
   // deconstruct opts
   const {
     students,
-    bannedPairs,
-    requiredPairs,
     groups,
     isDeterministic,
   } = opts;
 
-  let { graders } = opts;
+  let {
+    graders,
+    bannedPairs,
+    requiredPairs,
+  } = opts;
 
   /* -------------------- 1. Create Submissions ------------------- */
   let submissions = createSubmissions({ students, groups });
 
   /* ------------------- 2. Redefine Constraints ------------------ */
+  if (!bannedPairs) {
+    bannedPairs = [];
+  }
+  if (!requiredPairs) {
+    requiredPairs = [];
+  }
   const returnedConstraint = redefineConstraints({
     submissions,
     graders,
