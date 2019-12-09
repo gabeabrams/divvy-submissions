@@ -20,24 +20,24 @@ const graders = [
 	},
 	{
 		id: 2,
-       proportionalWorkload: 2,
-    },
+    proportionalWorkload: 2,
+  },
 ];
 
 // sample student object array
 const students = [
 	{
-       id: 1,
-       isSubmitted: true,
-    },
-    {
-       id: 2,
-       isSubmitted: true,
-    },
-    {
-       id: 3,
-       isSubmitted: true,
-    },
+  	id: 1,
+    isSubmitted: true,
+  },
+  {
+  	id: 2,
+    isSubmitted: true,
+  },
+  {
+  	id: 3,
+    isSubmitted: true,
+  },
 ];
 
 // call the divvy function, which will assign each student
@@ -165,33 +165,33 @@ const graders = [
 	// double grader
 	{
 		id: 2,
-       proportionalWorkload: 2,
-    },
-    // grader who is sick and grading 75% of the usual workload
-    {
+    proportionalWorkload: 2,
+  },
+  // grader who is sick and grading 75% of the usual workload
+  {
 		id: 3,
-       proportionalWorkload: 0.75,
-    },
+    proportionalWorkload: 0.75,
+  },
 ];
 
 // sample student object array
 const students = [
 	{
-       id: 1,
-       isSubmitted: true,
-    },
-    {
-       id: 2,
-       isSubmitted: true,
-    },
-    {
-       id: 3,
-       isSubmitted: true,
-    },
-    {
-       id: 4,
-       isSubmitted: true,
-    },
+  	id: 1,
+    isSubmitted: true,
+  },
+  {
+  	id: 2,
+    isSubmitted: true,
+  },
+  {
+  	id: 3,
+    isSubmitted: true,
+  },
+  {
+  	id: 4,
+    isSubmitted: true,
+  },
 ];
 
 // call the divvy function
@@ -218,20 +218,20 @@ const graders = [
 	// double grader
 	{
 		id: 2,
-       proportionalWorkload: 1,
-    },
+    proportionalWorkload: 1,
+  },
 ];
 
 // sample students array
 const students = [
 	{
-       id: 1,
-       isSubmitted: true,
-    },
-    {
-       id: 2,
-       isSubmitted: true,
-    },
+    id: 1,
+    isSubmitted: true,
+  },
+  {
+    id: 2,
+    isSubmitted: true,
+  },
 ];
 
 // required pairings
@@ -239,9 +239,9 @@ const requiredPairs = [
 	// grader with id 1 is required to grade the submission
 	// that contains the student with id 2
 	{
-       grader: 1,
-       student: 2,
-    },
+	  grader: 1,
+    student: 2,
+  },
 ];
 
 // call the divvy function
@@ -267,20 +267,20 @@ const graders = [
 	// double grader
 	{
 		id: 2,
-       proportionalWorkload: 1,
-    },
+    proportionalWorkload: 1,
+  },
 ];
 
 // sample students array
 const students = [
 	{
-       id: 1,
-       isSubmitted: true,
-    },
-    {
-       id: 2,
-       isSubmitted: true,
-    },
+    id: 1,
+    isSubmitted: true,
+  },
+  {
+    id: 2,
+    isSubmitted: true,
+  },
 ];
 
 // banned pairings
@@ -288,9 +288,9 @@ const bannedPairs = [
 	// grader with id 1 is banned to grade the submission
 	// that contains the student with id 2
 	{
-       grader: 1,
-       student: 2,
-    },
+    grader: 1,
+    student: 2,
+  },
 ];
 
 // call the divvy function
@@ -316,24 +316,24 @@ const graders = [
 	// double grader
 	{
 		id: 2,
-       proportionalWorkload: 1,
-    },
+    proportionalWorkload: 1,
+  },
 ];
 
 // sample students array
 const students = [
 	{
-       id: 1,
-       isSubmitted: true,
-    },
-    {
-       id: 2,
-       isSubmitted: true,
-    },
-    {
-       id: 3,
-       isSubmitted: true,
-    },
+    id: 1,
+    isSubmitted: true,
+  },
+  {
+    id: 2,
+    isSubmitted: true,
+  },
+  {
+    id: 3,
+    isSubmitted: true,
+  },
 ];
 
 // This sample groups array specifies that student with id 1 is in a group,
@@ -362,68 +362,68 @@ const graders = [
 	// double grader
 	{
 		id: 2,
-       proportionalWorkload: 2,
-    },
+    proportionalWorkload: 2,
+  },
 ];
 
 // sample students array
 const students = [
 	{
-       id: 1,
-       isSubmitted: true,
-    },
-    {
-       id: 2,
-       isSubmitted: true,
-    },
-    {
-       id: 3,
-       isSubmitted: true,
-    },
-    {
-       id: 4,
-       isSubmitted: true,
-    },
-    {
-       id: 5,
-       isSubmitted: true,
-    },
-    {
-       id: 6,
-       isSubmitted: true,
-    },
+    id: 1,
+    isSubmitted: true,
+  },
+  {
+    id: 2,
+    isSubmitted: true,
+  },
+  {
+    id: 3,
+    isSubmitted: true,
+	},
+	{
+    id: 4,
+    isSubmitted: true,
+	},
+  {
+    id: 5,
+    isSubmitted: true,
+	},
+  {
+    id: 6,
+    isSubmitted: true,
+  },
 ];
 
 // banned pairings
 const bannedPairs = [
 	{
-       grader: 1,
-       student: 2,
-    },
-    {
-       grader: 1,
-       student: 3,
-    },
-    {
-       grader: 1,
-       student: 4,
-    },
+    grader: 1,
+    student: 2,
+  },
+  {
+    grader: 1,
+    student: 3,
+  },
+  {
+    grader: 1,
+    student: 4,
+  },
 ];
 
 // required pairings
 const requiredPairs = [
 	{
-       grader: 1,
-       student: 1,
-    },
-    {
-       grader: 2,
-       student: 2,
-    },
-    {
-       grader: 2,
-       student: 6,
-    },
+  	grader: 1,
+    student: 1,
+  },
+  {
+  	grader: 2,
+    student: 2,
+  },
+  {
+  	grader: 2,
+    student: 6,
+  },
 ];
 
 // call the divvy function
