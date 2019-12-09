@@ -14,28 +14,28 @@ const divvy = require('divvy-submissions');
 
 // sample grader object array with different proportinalWorkload
 const graders = [
-	{
-		id: 1,
-		proportionalWorkload: 1,
-	},
-	{
-		id: 2,
+  {
+    id: 1,
+    proportionalWorkload: 1,
+  },
+  {
+    id: 2,
     proportionalWorkload: 2,
   },
 ];
 
 // sample student object array
 const students = [
-	{
-  	id: 1,
+  {
+    id: 1,
     isSubmitted: true,
   },
   {
-  	id: 2,
+    id: 2,
     isSubmitted: true,
   },
   {
-  	id: 3,
+    id: 3,
     isSubmitted: true,
   },
 ];
@@ -82,9 +82,9 @@ The algorithm will return three objects: `studentToGraderMap` shows which studen
 
 ```js
 const {
-	studentToGraderMap,
-	workloadMap,
-	constraintViolations,
+  studentToGraderMap,
+  workloadMap,
+  constraintViolations,
 } = divvy(...);
 ```
 
@@ -101,13 +101,13 @@ let graderToStudentMap = {};
 
 // Go through each student and add them under their assigned grader
 Object.keys(studentToGraderMap).forEach((studentId)=> {
-	// find the assinged graderId for this student
-	const graderId = studentToGraderMap[studentId];
-	// add this student into the array of students the grader is grading
-	if (!graderToStudentMap) {
-		graderToStudentMap[graderId] = [];
-	}
-	graderToStudentMap[graderId].push(studentId);
+  // find the assigned graderId for this student
+  const graderId = studentToGraderMap[studentId];
+  // add this student into the array of students the grader is grading
+  if (!graderToStudentMap) {
+    graderToStudentMap[graderId] = [];
+  }
+  graderToStudentMap[graderId].push(studentId);
 });
 ```
 
@@ -115,7 +115,7 @@ Object.keys(studentToGraderMap).forEach((studentId)=> {
 
 workloadMap `{ graderId => numToGrade }` is for looking up how many submissions a grader has been assigned to grade. A submission is different than a student. In the case of group assignments, all the students in the same group will be in the same submission. It will be easier for them to all be graded by the same grader as there are similarities between their work. In the case of individual assignments, each submission will correspond to each individual student. If you are more interested in which students a specific grader has been assigned to grade, please refer to the example above that converts the `studentToGraderMap`.
 
-Workload is divvied up according to `proportionalWorkload` provided with each grader. For example, in the case where there are two graders: grader 1 has a proportionalWorkload of 1 and grader 2 has a `proportionalWorkload` of 2; 3 submission; and no banned/required pairs constraints: grader 1 will be randomly assinged one of the three submissions, while grader 2 will be assinged the other two. More complicated cases where submissions can't be evenly divided is explained in the [More on the algorithms](#more-on-the-algorithm-how-we-divvy-submissions) section at the end.
+Workload is divvied up according to `proportionalWorkload` provided with each grader. For example, in the case where there are two graders: grader 1 has a proportionalWorkload of 1 and grader 2 has a `proportionalWorkload` of 2; 3 submission; and no banned/required pairs constraints: grader 1 will be randomly assigned one of the three submissions, while grader 2 will be assigned the other two. More complicated cases where submissions can't be evenly divided is explained in the [More on the algorithms](#more-on-the-algorithm-how-we-divvy-submissions) section at the end.
 
 #### constraintViolations
 
@@ -123,14 +123,14 @@ Sometimes the algorithm has to break the banned/required pairs constraints in or
 
 ```js
 {
-	englishDescription: <string description for user>,
-	type: <'banned' or 'required'>,
-	listOfStudentsInvolved: <array of student ids>,
-	listOfGradersInvolved: <array of grader ids>,
+  englishDescription: <string description for user>,
+  type: <'banned' or 'required'>,
+  listOfStudentsInvolved: <array of student ids>,
+  listOfGradersInvolved: <array of grader ids>,
  }
 ```
 
-There are a totle of 3 different kinds of violations that can happen throughout the algorithm:
+There are a total of 3 different kinds of violations that can happen throughout the algorithm:
 
 _Violation Type 1: A grader is grading a submission that is banned_
 
@@ -142,7 +142,7 @@ _Violation Type 2: A grader is grading a submission that is required to be grade
 
 _Violation Type 3: Multiple graders are required to grade the same submission, impossible constraint_
 
-> When more than one grader is required to grade the same submission, it is impossible to avoid a violation no matter who we assign this submission to. Since this kind of violations occured before the algorithm is even run, we decided to store them in a separate array and remove that student from all graders' required grading list so that it doesn't impact the result of the algorithm. We then return the union this pre-occured violations array and the violations that are generated through running the algorithm as constraintViolations.
+> When more than one grader is required to grade the same submission, it is impossible to avoid a violation no matter who we assign this submission to. Since this kind of violations occurred before the algorithm is even run, we decided to store them in a separate array and remove that student from all graders' required grading list so that it doesn't impact the result of the algorithm. We then return the union this pre-occurred violations array and the violations that are generated through running the algorithm as constraintViolations.
 
 ## Examples
 
@@ -157,39 +157,39 @@ In this example, we have a double grader and someone who is sick and grading 75%
 const divvy = require('divvy-submissions');
 
 const graders = [
-	// regular grader
-	{
-		id: 1,
-		proportionalWorkload: 1,
-	},
-	// double grader
-	{
-		id: 2,
+  // regular grader
+  {
+    id: 1,
+    proportionalWorkload: 1,
+  },
+  // double grader
+  {
+    id: 2,
     proportionalWorkload: 2,
   },
   // grader who is sick and grading 75% of the usual workload
   {
-		id: 3,
+    id: 3,
     proportionalWorkload: 0.75,
   },
 ];
 
 // sample student object array
 const students = [
-	{
-  	id: 1,
+  {
+    id: 1,
     isSubmitted: true,
   },
   {
-  	id: 2,
+    id: 2,
     isSubmitted: true,
   },
   {
-  	id: 3,
+    id: 3,
     isSubmitted: true,
   },
   {
-  	id: 4,
+    id: 4,
     isSubmitted: true,
   },
 ];
@@ -210,21 +210,21 @@ const divvy = require('divvy-submissions');
 
 // sample graders
 const graders = [
-	// regular grader
-	{
-		id: 1,
-		proportionalWorkload: 1,
-	},
-	// double grader
-	{
-		id: 2,
+  // regular grader
+  {
+    id: 1,
+    proportionalWorkload: 1,
+  },
+  // double grader
+  {
+    id: 2,
     proportionalWorkload: 1,
   },
 ];
 
 // sample students array
 const students = [
-	{
+  {
     id: 1,
     isSubmitted: true,
   },
@@ -236,10 +236,10 @@ const students = [
 
 // required pairings
 const requiredPairs = [
-	// grader with id 1 is required to grade the submission
-	// that contains the student with id 2
-	{
-	  grader: 1,
+  // grader with id 1 is required to grade the submission
+  // that contains the student with id 2
+  {
+    grader: 1,
     student: 2,
   },
 ];
@@ -259,21 +259,21 @@ const divvy = require('divvy-submissions');
 
 // sample graders
 const graders = [
-	// regular grader
-	{
-		id: 1,
-		proportionalWorkload: 1,
-	},
-	// double grader
-	{
-		id: 2,
+  // regular grader
+  {
+    id: 1,
+    proportionalWorkload: 1,
+  },
+  // double grader
+  {
+    id: 2,
     proportionalWorkload: 1,
   },
 ];
 
 // sample students array
 const students = [
-	{
+  {
     id: 1,
     isSubmitted: true,
   },
@@ -285,9 +285,9 @@ const students = [
 
 // banned pairings
 const bannedPairs = [
-	// grader with id 1 is banned to grade the submission
-	// that contains the student with id 2
-	{
+  // grader with id 1 is banned to grade the submission
+  // that contains the student with id 2
+  {
     grader: 1,
     student: 2,
   },
@@ -308,21 +308,21 @@ const divvy = require('divvy-submissions');
 
 // sample graders
 const graders = [
-	// regular grader
-	{
-		id: 1,
-		proportionalWorkload: 1,
-	},
-	// double grader
-	{
-		id: 2,
+  // regular grader
+  {
+    id: 1,
+    proportionalWorkload: 1,
+  },
+  // double grader
+  {
+    id: 2,
     proportionalWorkload: 1,
   },
 ];
 
 // sample students array
 const students = [
-	{
+  {
     id: 1,
     isSubmitted: true,
   },
@@ -354,21 +354,21 @@ const divvy = require('divvy-submissions');
 
 // sample graders
 const graders = [
-	// regular grader
-	{
-		id: 1,
-		proportionalWorkload: 1,
-	},
-	// double grader
-	{
-		id: 2,
+  // regular grader
+  {
+    id: 1,
+    proportionalWorkload: 1,
+  },
+  // double grader
+  {
+    id: 2,
     proportionalWorkload: 2,
   },
 ];
 
 // sample students array
 const students = [
-	{
+  {
     id: 1,
     isSubmitted: true,
   },
@@ -379,15 +379,15 @@ const students = [
   {
     id: 3,
     isSubmitted: true,
-	},
-	{
+  },
+  {
     id: 4,
     isSubmitted: true,
-	},
+  },
   {
     id: 5,
     isSubmitted: true,
-	},
+  },
   {
     id: 6,
     isSubmitted: true,
@@ -396,7 +396,7 @@ const students = [
 
 // banned pairings
 const bannedPairs = [
-	{
+  {
     grader: 1,
     student: 2,
   },
@@ -412,48 +412,48 @@ const bannedPairs = [
 
 // required pairings
 const requiredPairs = [
-	{
-  	grader: 1,
+  {
+    grader: 1,
     student: 1,
   },
   {
-  	grader: 2,
+    grader: 2,
     student: 2,
   },
   {
-  	grader: 2,
+    grader: 2,
     student: 6,
   },
 ];
 
 // call the divvy function
 const res = divvy({
-	graders,
-	students,
-	bannedPairs,
-	requiredPairs,
+  graders,
+  students,
+  bannedPairs,
+  requiredPairs,
 });
 
 /*
-	The expected studentToGraderMap returned in this case is:
-	{
-		1: 1,
-		2: 2,
-		3: 2,
-		4: 2,
-		5: 1,
-		6: 2,
-	};
+  The expected studentToGraderMap returned in this case is:
+  {
+  1: 1,
+  2: 2,
+  3: 2,
+  4: 2,
+  5: 1,
+  6: 2,
+  };
 
-	The expected workloadMap returned is:
-	{
-		// grader 1 is grading 2 submissions, grader 2 is grading 4 submissions
-	 	1: 2,
-	 	2: 4,
-	}
+  The expected workloadMap returned is:
+  {
+    // grader 1 is grading 2 submissions, grader 2 is grading 4 submissions
+    1: 2,
+    2: 4,
+  }
 
-	The expected constraintViolations returned should be an empty array as
-	this assignment doesn't violate any constraints
+  The expected constraintViolations returned should be an empty array as
+  this assignment doesn't violate any constraints
 */
 
 ```
