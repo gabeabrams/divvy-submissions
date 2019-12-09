@@ -1,6 +1,6 @@
 {
 	"name": "divvy-submissions",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "A script that takes a list of graders and submissions, and divvies up the submissions among the graders while adhering to constraints.",
 	"main": "index.js",
 	"scripts": {
